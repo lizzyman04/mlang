@@ -39,38 +39,17 @@ impl Parser {
         }
     }
 
-    pub fn expect_token(&mut self, expected: &str) -> Result<(), ParseError> {
-        if let Some(token) = self.advance() {
-            let matches = match &token.kind {
-                TokenKind::Symbol(sym) => {
-                    expected.len() == 1 && *sym == expected.chars().next().unwrap()
-                }
-                TokenKind::Keyword(kw) => kw == expected,
-                _ => false,
-            };
-
-            if matches {
-                Ok(())
-            } else {
-                Err(ParseError::new(
-                    token,
-                    format!("Expected token '{}', found {:?}", expected, token.kind),
-                ))
-            }
+    pub fn check_keyword(&self, keyword: &str) -> bool {
+        if let Some(token) = self.peek() {
+            matches!(&token.kind, TokenKind::Keyword(k) if k == keyword)
         } else {
-            Err(ParseError::eof(&format!("Expected token '{}', but got EOF", expected)))
+            false
         }
     }
 
-    pub fn check_token(&self, expected: &str) -> bool {
+    pub fn check_token_kind(&self, kind: &TokenKind) -> bool {
         if let Some(token) = self.peek() {
-            match &token.kind {
-                TokenKind::Symbol(sym) => {
-                    expected.len() == 1 && *sym == expected.chars().next().unwrap()
-                }
-                TokenKind::Keyword(kw) => kw == expected,
-                _ => false,
-            }
+            &token.kind == kind
         } else {
             false
         }

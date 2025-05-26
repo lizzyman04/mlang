@@ -10,7 +10,7 @@ pub enum TokenKind {
     LeftBrace,
     RightBrace,
     Semicolon,
-
+    Equal,
     Eof,
 }
 

@@ -1,3 +1,3 @@
-pub mod interpreter;
+pub mod executor;
 
-pub use interpreter::execute;
+pub use executor::execute;

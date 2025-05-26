@@ -77,6 +77,7 @@ pub fn tokenize(source: &str) -> Result<Vec<Token>, String> {
             '{' => { chars.next(); tokens.push(Token { kind: TokenKind::LeftBrace, line, column }); }
             '}' => { chars.next(); tokens.push(Token { kind: TokenKind::RightBrace, line, column }); }
             ';' => { chars.next(); tokens.push(Token { kind: TokenKind::Semicolon, line, column }); }
+            '=' => { chars.next(); tokens.push(Token { kind: TokenKind::Equal, line, column }); }
 
             _ => {
                 return Err(format!("Unexpected character '{}' at line {}, column {}", ch, line, column));

@@ -1,17 +1,17 @@
-// use std::collections::HashSet;
+use std::collections::HashSet;
 
-// pub fn is_keyword(word: &str) -> bool {
-//     let keywords: HashSet<&str> = [
-//         "int", "dec", "txt", "bool", "true", "false",
-//         "main", "print"
-//     ]
-//     .iter()
-//     .copied()
-//     .collect();
+pub fn is_keyword(word: &str) -> bool {
+    let keywords: HashSet<&str> = [
+        "int", "dec", "txt", "bool", "true", "false",
+        "main", "print"
+    ]
+    .iter()
+    .copied()
+    .collect();
 
-//     keywords.contains(word)
-// }
+    keywords.contains(word)
+}
 
-// pub fn is_operator(ch: char) -> bool {
-//     matches!(ch, '+' | '-' | '*' | '/' | '=')
-// }
+pub fn is_operator(ch: char) -> bool {
+    matches!(ch, '+' | '-' | '*' | '/' | '=')
+}
