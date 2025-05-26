@@ -23,11 +23,13 @@ MLang supports statically-typed variable declarations with implicit type inferen
 - `int`: Integer values
 - `dec`: Decimal/float values (high precision)
 - `txt`: String values (renamed for clarity and uniqueness)
+- `bool`: True or false
 
 ```mlang
 int x = 10;
 dec pi = 3.14159;
 txt name = "MLang";
+bool active = false;
 ````
 
 ---

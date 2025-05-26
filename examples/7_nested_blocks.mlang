@@ -1,0 +1,9 @@
+main() {
+  print("Start");
+  {
+    print("Nested block");
+    {
+      print("Deeper");
+    }
+  }
+}

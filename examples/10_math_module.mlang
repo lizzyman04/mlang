@@ -1,0 +1,5 @@
+dec result = math.sqrt(16);
+
+main() {
+  print("Result is: " + result);
+}

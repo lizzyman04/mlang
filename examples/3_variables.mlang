@@ -1,0 +1,9 @@
+int x = 42;
+dec pi = 3.14;
+txt msg = "Ready";
+
+main() {
+  print(msg);
+  print(x);
+  print(pi);
+}

@@ -14,3 +14,7 @@ main() {
     print(sol.step(j));
   }
 }
+
+greet() {
+  print("Hi from greet!");
+}
