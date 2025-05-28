@@ -55,15 +55,4 @@ impl Parser {
             Err(format!("Expected keyword '{}', but found end of input", expected))
         }
     }
-
-    // pub fn check_token(&self, keyword: &str) -> bool {
-    //     if let Some(token) = self.peek() {
-    //         match &token.kind {
-    //             TokenKind::Keyword(kw) => kw == keyword,
-    //             _ => false,
-    //         }
-    //     } else {
-    //         false
-    //     }
-    // }
 }

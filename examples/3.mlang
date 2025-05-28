@@ -1,9 +1,8 @@
-
 main() {
-  int x = 42;
+  int year = 2025;
   dec pi = 3.14;
   txt msg = "Ready";
   print(msg);
-  print(x);
+  print(year);
   print(pi);
 }

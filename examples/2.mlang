@@ -1,4 +1,5 @@
 main() {
   print("Olá");
-  print(123);
+  print(2025);
+  print(3.14);
 }

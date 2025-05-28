@@ -30,6 +30,7 @@ pub fn parse_expression(parser: &mut Parser) -> Result<ASTNode, String> {
     if let Some(token) = parser.advance() {
         match &token.kind {
             TokenKind::Int(i) => Ok(ASTNode::Expression(Expression::IntLiteral(*i))),
+            TokenKind::Dec(f) => Ok(ASTNode::Expression(Expression::DecLiteral(*f))),
             TokenKind::Txt(s) => Ok(ASTNode::Expression(Expression::TxtLiteral(s.clone()))),
             TokenKind::Identifier(id) => Ok(ASTNode::Expression(Expression::Identifier(id.clone()))),
             _ => Err(format!(
