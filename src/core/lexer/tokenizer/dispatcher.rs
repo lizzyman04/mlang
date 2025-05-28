@@ -15,6 +15,17 @@ pub fn tokenize(source: &str) -> Result<Vec<Token>, String> {
         column += 1;
 
         match ch {
+            '#' => {
+                while let Some(&next) = chars.peek() {
+                    chars.next();
+                    if next == '\n' {
+                        break;
+                    }
+                }
+                line += 1;
+                column = 0;
+            }
+            
             c if c.is_whitespace() => {
                 if c == '\n' {
                     line += 1;

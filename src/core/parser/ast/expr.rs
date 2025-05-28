@@ -1,3 +1,5 @@
+use crate::core::lexer::token::TokenKind;
+
 #[derive(Debug, Clone)]
 pub enum Expression {
     IntLiteral(i64),
@@ -5,4 +7,15 @@ pub enum Expression {
     TxtLiteral(String),
     BoolLiteral(bool),
     Identifier(String),
+    Binary {
+        left: Box<Expression>,
+        operator: TokenKind,
+        right: Box<Expression>,
+    },
+}
+
+pub enum ExecutionResult {
+    // Value(String), 
+    Unit,
+    Return(Expression),
 }

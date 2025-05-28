@@ -15,12 +15,13 @@ pub fn read_symbol(
         '}' => TokenKind::RightBrace,
         ';' => TokenKind::Semicolon,
         '=' => TokenKind::Equal,
+        '+' => TokenKind::Plus,
+        '-' => TokenKind::Minus,
+        '*' => TokenKind::Star,
+        '/' => TokenKind::Slash,
+        ',' => TokenKind::Comma,
         _ => return Ok(None),
     };
 
-    Ok(Some(Token {
-        kind,
-        line,
-        column,
-    }))
+    Ok(Some(Token { kind, line, column }))
 }

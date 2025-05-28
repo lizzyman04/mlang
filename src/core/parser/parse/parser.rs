@@ -31,13 +31,13 @@ impl Parser {
             } else {
                 Err(format!(
                     "Expected token {:?} but found {:?} at line {}, column {}",
-                    expected, token.kind, token.line, token.column
+                    expected.display(), token.kind.display(), token.line, token.column
                 ))
             }
         } else {
             Err(format!(
                 "Expected token {:?}, but found end of input",
-                expected
+                expected.display(),
             ))
         }
     }
@@ -48,7 +48,7 @@ impl Parser {
                 TokenKind::Keyword(kw) if kw == expected => Ok(()),
                 _ => Err(format!(
                     "Expected keyword '{}' but found {:?} at line {}, column {}",
-                    expected, token.kind, token.line, token.column
+                    expected, token.kind.display(), token.line, token.column
                 )),
             }
         } else {
@@ -56,6 +56,25 @@ impl Parser {
                 "Expected keyword '{}', but found end of input",
                 expected
             ))
+        }
+    }
+
+    pub fn check(&self, expected: &TokenKind) -> bool {
+        if let Some(token) = self.peek() {
+            &token.kind == expected
+        } else {
+            false
+        }
+    }
+
+    pub fn consume_identifier(&mut self) -> Result<&Token, String> {
+        let token = self.advance().ok_or("Expected identifier but found EOF")?;
+        match &token.kind {
+            TokenKind::Identifier(_) => Ok(token),
+            _ => Err(format!(
+                "Expected identifier but found {:?} at line {}, column {}",
+                token.kind.display(), token.line, token.column
+            )),
         }
     }
 

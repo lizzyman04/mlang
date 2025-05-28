@@ -5,6 +5,11 @@ pub enum ASTNode {
     FunctionDecl {
         name: String,
         body: Vec<ASTNode>,
+        return_type: String,
+        params: Vec<(String, String)>,
+    },
+    ReturnStmt {
+        value: Box<ASTNode>,
     },
     PrintStmt {
         expression: Box<ASTNode>,
@@ -16,3 +21,4 @@ pub enum ASTNode {
     },
     Expression(Expression),
 }
+

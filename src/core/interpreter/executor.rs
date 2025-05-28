@@ -1,4 +1,6 @@
+use crate::core::lexer::rules::infer_type_expr;
 use crate::core::parser::ast::ASTNode;
+use crate::core::parser::ast::expr::ExecutionResult;
 
 use super::env::Environment;
 use super::stmt::execute_stmt;
@@ -7,10 +9,32 @@ pub fn execute(program: Vec<ASTNode>) -> Result<(), String> {
     let mut env = Environment::new();
 
     for node in program {
-        if let ASTNode::FunctionDecl { name, body } = node {
+        if let ASTNode::FunctionDecl {
+            name,
+            body,
+            return_type,
+            params,
+        } = node
+        {
             if name == "main" {
+                if !params.is_empty() {
+                    return Err("Function 'main' should not have parameters".to_string());
+                }
+
                 for stmt in body {
-                    execute_stmt(stmt, &mut env)?;
+                    match execute_stmt(stmt, &mut env)? {
+                        ExecutionResult::Return(value) => {
+                            if return_type != "void" && return_type != infer_type_expr(&value) {
+                                return Err(format!(
+                                    "Return type mismatch: expected '{}', got '{}'",
+                                    return_type,
+                                    infer_type_expr(&value)
+                                ));
+                            }
+                            return Ok(());
+                        }
+                        _ => continue,
+                    }
                 }
                 return Ok(());
             }

@@ -1,14 +1,21 @@
-use crate::core::parser::ast::{ASTNode, Expression};
 use super::env::Environment;
 use super::eval::eval_expression;
+use crate::core::parser::ast::expr::ExecutionResult;
+use crate::core::parser::ast::{ASTNode, Expression};
 
-pub fn execute_stmt(stmt: ASTNode, env: &mut Environment) -> Result<(), String> {
+pub fn execute_stmt(stmt: ASTNode, env: &mut Environment) -> Result<ExecutionResult, String> {
     match stmt {
         ASTNode::PrintStmt { expression } => {
             if let ASTNode::Expression(expr) = *expression {
                 let value = eval_expression(expr, env)?;
-                println!("{}", value);
-                Ok(())
+                match value {
+                    Expression::IntLiteral(i) => println!("{}", i),
+                    Expression::DecLiteral(f) => println!("{}", f),
+                    Expression::BoolLiteral(b) => println!("{}", b),
+                    Expression::TxtLiteral(s) => println!("{}", s),
+                    _ => return Err("Unsupported expression type in print.".to_string()),
+                }
+                Ok(ExecutionResult::Unit)
             } else {
                 Err("Expected expression in print.".to_string())
             }
@@ -36,9 +43,18 @@ pub fn execute_stmt(stmt: ASTNode, env: &mut Environment) -> Result<(), String> 
                 }
 
                 env.set(name, var_type, expr);
-                Ok(())
+                Ok(ExecutionResult::Unit)
             } else {
                 Err("Invalid expression in variable declaration.".to_string())
+            }
+        }
+
+        ASTNode::ReturnStmt { value } => {
+            if let ASTNode::Expression(expr) = *value {
+                let result = eval_expression(expr, env)?;
+                Ok(ExecutionResult::Return(result))
+            } else {
+                Err("Invalid expression in return statement.".to_string())
             }
         }
 
