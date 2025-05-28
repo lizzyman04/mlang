@@ -3,8 +3,9 @@ pub enum TokenKind {
     Int(i64),
     Dec(f64),
     Txt(String),
-    Identifier(String),
+    Bool(bool),
     Keyword(String),
+    Identifier(String),
 
     LeftParen,
     RightParen,

@@ -1,5 +1,5 @@
-use crate::core::parser::parser::Parser;
 use crate::core::lexer::token::TokenKind;
+use crate::core::parser::parse::parser::Parser;
 use crate::core::parser::ast::{ASTNode, Expression};
 
 pub fn parse_var_decl(parser: &mut Parser) -> Result<ASTNode, String> {
@@ -31,6 +31,7 @@ pub fn parse_expression(parser: &mut Parser) -> Result<ASTNode, String> {
         match &token.kind {
             TokenKind::Int(i) => Ok(ASTNode::Expression(Expression::IntLiteral(*i))),
             TokenKind::Dec(f) => Ok(ASTNode::Expression(Expression::DecLiteral(*f))),
+            TokenKind::Bool(b) => Ok(ASTNode::Expression(Expression::BoolLiteral(*b))),
             TokenKind::Txt(s) => Ok(ASTNode::Expression(Expression::TxtLiteral(s.clone()))),
             TokenKind::Identifier(id) => Ok(ASTNode::Expression(Expression::Identifier(id.clone()))),
             _ => Err(format!(

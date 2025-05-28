@@ -1,7 +1,7 @@
-use crate::core::parser::ast::ASTNode;
-use crate::core::parser::parser::Parser;
-use crate::core::lexer::token::TokenKind;
 use super::parser::parse_statement;
+use crate::core::lexer::token::TokenKind;
+use crate::core::parser::ast::ASTNode;
+use crate::core::parser::parse::parser::Parser;
 
 pub fn parse_function_decl(parser: &mut Parser) -> Result<ASTNode, String> {
     parser.consume_keyword("main")?;

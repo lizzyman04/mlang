@@ -1,5 +1,5 @@
 use crate::core::parser::ast::ASTNode;
-use crate::core::parser::parser::Parser;
+use crate::core::parser::parse::parser::Parser;
 use crate::core::parser::stmt::var::parse_expression;
 use crate::core::lexer::token::TokenKind;
 

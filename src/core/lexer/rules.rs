@@ -12,6 +12,10 @@ pub fn is_keyword(word: &str) -> bool {
     keywords.contains(word)
 }
 
-pub fn is_operator(ch: char) -> bool {
-    matches!(ch, '+' | '-' | '*' | '/' | '=')
+// pub fn is_operator(ch: char) -> bool {
+//     matches!(ch, '+' | '-' | '*' | '/' | '=')
+// }
+
+pub fn is_variable_type(word: &str) -> bool {
+    matches!(word, "int" | "dec" | "txt" | "bool")
 }

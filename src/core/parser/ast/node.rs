@@ -10,8 +10,8 @@ pub enum ASTNode {
         expression: Box<ASTNode>,
     },
     VarDecl {
-        var_type: String,
         name: String,
+        var_type: String,
         value: Box<ASTNode>,
     },
     Expression(Expression),

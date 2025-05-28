@@ -8,6 +8,7 @@ pub fn eval_expression(
     match expr {
         Expression::IntLiteral(i) => Ok(i.to_string()),
         Expression::DecLiteral(f) => Ok(f.to_string()),
+        Expression::BoolLiteral(b) => Ok(b.to_string()),
         Expression::TxtLiteral(s) => Ok(s),
         Expression::Identifier(name) => {
             if let Some((_typ, value)) = env.get(&name) {

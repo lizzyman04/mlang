@@ -7,10 +7,7 @@ pub struct Parser {
 
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {
-        Self {
-            tokens,
-            current: 0,
-        }
+        Self { tokens, current: 0 }
     }
 
     pub fn peek(&self) -> Option<&Token> {
@@ -38,7 +35,10 @@ impl Parser {
                 ))
             }
         } else {
-            Err(format!("Expected token {:?}, but found end of input", expected))
+            Err(format!(
+                "Expected token {:?}, but found end of input",
+                expected
+            ))
         }
     }
 
@@ -52,7 +52,14 @@ impl Parser {
                 )),
             }
         } else {
-            Err(format!("Expected keyword '{}', but found end of input", expected))
+            Err(format!(
+                "Expected keyword '{}', but found end of input",
+                expected
+            ))
         }
+    }
+
+    pub fn is_at_end(&self) -> bool {
+        matches!(self.peek(), Some(token) if matches!(token.kind, TokenKind::Eof))
     }
 }

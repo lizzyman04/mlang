@@ -24,6 +24,7 @@ pub fn execute_stmt(stmt: ASTNode, env: &mut Environment) -> Result<(), String> 
                     ("int", Expression::IntLiteral(_)) => true,
                     ("dec", Expression::DecLiteral(_)) => true,
                     ("txt", Expression::TxtLiteral(_)) => true,
+                    ("bool", Expression::BoolLiteral(_)) => true,
                     _ => false,
                 };
 
