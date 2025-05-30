@@ -1,4 +1,4 @@
-use crate::core::lexer::token::TokenKind;
+use crate::core::lexer::token::Token;
 
 #[derive(Debug, Clone)]
 pub enum Expression {
@@ -9,7 +9,7 @@ pub enum Expression {
     Identifier(String),
     Binary {
         left: Box<Expression>,
-        operator: TokenKind,
+        operator: Token,
         right: Box<Expression>,
     },
 }

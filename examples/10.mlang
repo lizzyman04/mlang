@@ -1,5 +1,6 @@
-dec result = math.sqrt(16);
+# Math module
 
 main() {
+  dec result = math.sqrt(16);
   print("Result is: " + result);
 }

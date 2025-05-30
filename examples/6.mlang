@@ -1,0 +1,12 @@
+# I'm just a comment
+# Me too
+
+int add(int a, int b) {
+    int result = a + b;
+    return result;
+}
+
+main() {
+    bool flag = true;
+    print(flag);
+}

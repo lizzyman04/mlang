@@ -1,3 +1,4 @@
+use crate::core::lexer::symbol::simple::SimpleSymbolKind;
 use crate::core::lexer::token::TokenKind;
 use crate::core::parser::parse::expr::parse_expression;
 use crate::core::parser::parse::parser::Parser;
@@ -8,9 +9,9 @@ pub fn parse_var_decl_with_name_and_type(
     var_type: &str,
     name: &str,
 ) -> Result<ASTNode, String> {
-    parser.consume(&TokenKind::Equal)?;
+    parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Equal))?;
     let expr = parse_expression(parser)?;
-    parser.consume(&TokenKind::Semicolon)?;
+    parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Semicolon))?;
 
     Ok(ASTNode::VarDecl {
         var_type: var_type.to_string(),
@@ -18,21 +19,3 @@ pub fn parse_var_decl_with_name_and_type(
         value: Box::new(expr),
     })
 }
-
-// pub fn parse_expression(parser: &mut Parser) -> Result<ASTNode, String> {
-//     if let Some(token) = parser.advance() {
-//         match &token.kind {
-//             TokenKind::Int(i) => Ok(ASTNode::Expression(Expression::IntLiteral(*i))),
-//             TokenKind::Dec(f) => Ok(ASTNode::Expression(Expression::DecLiteral(*f))),
-//             TokenKind::Bool(b) => Ok(ASTNode::Expression(Expression::BoolLiteral(*b))),
-//             TokenKind::Txt(s) => Ok(ASTNode::Expression(Expression::TxtLiteral(s.clone()))),
-//             TokenKind::Identifier(id) => Ok(ASTNode::Expression(Expression::Identifier(id.clone()))),
-//             _ => Err(format!(
-//                 "Expected literal but found {:?} at line {}, column {}",
-//                 token.kind, token.line, token.column
-//             )),
-//         }
-//     } else {
-//         Err("Unexpected end of input in expression.".to_string())
-//     }
-// }

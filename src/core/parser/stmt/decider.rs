@@ -1,3 +1,4 @@
+use crate::core::lexer::symbol::simple::SimpleSymbolKind;
 use crate::core::lexer::token::TokenKind;
 use crate::core::parser::ast::ASTNode;
 use crate::core::parser::parse::parser::Parser;
@@ -19,8 +20,8 @@ pub fn parse_var_or_function_decl(parser: &mut Parser, var_type: &str) -> Result
     };
 
     match parser.peek().map(|t| &t.kind) {
-        Some(TokenKind::LeftParen) => parse_function_decl_with_signature(parser, var_type, &name),
-        Some(TokenKind::Equal) => parse_var_decl_with_name_and_type(parser, var_type, &name),
+        Some(TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen)) => parse_function_decl_with_signature(parser, var_type, &name),
+        Some(TokenKind::SimpleSymbol(SimpleSymbolKind::Equal)) => parse_var_decl_with_name_and_type(parser, var_type, &name),
         Some(other) => Err(format!(
             "Expected '(' for function or '=' for variable, found {} at line {}, column {}",
             other.display(),

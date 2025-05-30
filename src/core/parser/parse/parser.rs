@@ -1,4 +1,4 @@
-use crate::core::lexer::token::{Token, TokenKind};
+use crate::core::lexer::{symbol::simple::SimpleSymbolKind, token::{Token, TokenKind}};
 
 pub struct Parser {
     tokens: Vec<Token>,
@@ -79,6 +79,6 @@ impl Parser {
     }
 
     pub fn is_at_end(&self) -> bool {
-        matches!(self.peek(), Some(token) if matches!(token.kind, TokenKind::Eof))
+        matches!(self.peek(), Some(token) if matches!(token.kind, TokenKind::SimpleSymbol(SimpleSymbolKind::Eof)))
     }
 }

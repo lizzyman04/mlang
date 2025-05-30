@@ -27,7 +27,12 @@ pub fn execute_stmt(stmt: ASTNode, env: &mut Environment) -> Result<ExecutionRes
             value,
         } => {
             if let ASTNode::Expression(expr) = *value {
-                let evaluated = evaluate(expr.clone(), env)?;
+                let evaluated = match evaluate(expr.clone(), env) {
+                    Ok(val) => val,
+                    Err(e) => {
+                        return Err(e);
+                    }
+                };
 
                 let matches_type = match (&var_type[..], &evaluated) {
                     ("int", Expression::IntLiteral(_)) => true,

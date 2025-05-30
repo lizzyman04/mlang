@@ -1,11 +1,6 @@
-# I'm just a comment
-# Me too
-
-int add(int a, int b) {
-    return a + b;
-}
-
 main() {
-    bool flag = true;
-    print(flag);
+    int b = 12;
+    int exp = 3;
+    int complex = ((7 + b) * 4)^exp;
+    print(complex);
 }

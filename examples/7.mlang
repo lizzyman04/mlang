@@ -1,0 +1,10 @@
+# Function calling
+
+main() {
+    txt msg = mymsg("Trust me, I'm an engineer.");
+    print(msg);
+}
+
+txt mymsg(string msg) {
+  return msg;
+}

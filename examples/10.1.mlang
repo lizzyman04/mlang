@@ -1,7 +1,0 @@
-bool flag = true;
-
-main() {
-  if flag {
-    print("The flag is true");
-  }
-}

@@ -1,3 +1,4 @@
+use crate::core::lexer::symbol::simple::SimpleSymbolKind;
 use crate::core::lexer::token::{Token, TokenKind};
 
 use super::identifiers::read_identifier_or_keyword;
@@ -56,7 +57,7 @@ pub fn tokenize(source: &str) -> Result<Vec<Token>, String> {
     }
 
     tokens.push(Token {
-        kind: TokenKind::Eof,
+        kind: TokenKind::SimpleSymbol(SimpleSymbolKind::Eof),
         line,
         column,
     });

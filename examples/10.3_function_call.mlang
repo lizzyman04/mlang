@@ -1,8 +1,0 @@
-main() {
-  print("Calling a function");
-  greet();
-}
-
-greet() {
-  print("Hello from greet!");
-}

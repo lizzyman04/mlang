@@ -1,20 +1,20 @@
-int a = 5;
-dec pi = math.pi;
-txt greeting = "Hello, MLang!";
-
 main() {
+
+  int a = 5;
+  dec pi = math.pi;
+  txt greeting = "Hello, MLang!";
+
   print(greeting);
+
   for i = 0; i < a; i = i + 1; {
     print("Iteration: " + i);
   }
+
   sol = math.solve("2*x + 4 = 10");
   print("Solution: " + sol.result());
   print("Steps:");
+  
   for j = 0; j < sol.steps().length; j = j + 1; {
     print(sol.step(j));
   }
-}
-
-greet() {
-  print("Hi from greet!");
 }

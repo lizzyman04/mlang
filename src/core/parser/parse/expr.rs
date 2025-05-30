@@ -1,3 +1,4 @@
+use crate::core::lexer::symbol::simple::SimpleSymbolKind;
 use crate::core::lexer::token::TokenKind;
 use crate::core::parser::ast::{ASTNode, Expression};
 use crate::core::parser::parse::parser::Parser;
@@ -10,9 +11,11 @@ fn parse_term(parser: &mut Parser) -> Result<ASTNode, String> {
     let mut node = parse_factor(parser)?;
 
     while let Some(token) = parser.peek() {
-        match token.kind {
-            TokenKind::Plus | TokenKind::Minus => {
-                let operator = parser.advance().unwrap().kind.clone(); // consume operator
+        match &token.kind {
+            TokenKind::SimpleSymbol(SimpleSymbolKind::Plus)
+            | TokenKind::SimpleSymbol(SimpleSymbolKind::Minus)
+            | TokenKind::MathSymbol(_) => {
+                let operator = parser.advance().unwrap().clone();
                 let right = parse_factor(parser)?;
                 node = ASTNode::Expression(Expression::Binary {
                     left: Box::new(extract_expr(node)?),
@@ -31,9 +34,11 @@ fn parse_factor(parser: &mut Parser) -> Result<ASTNode, String> {
     let mut node = parse_primary(parser)?;
 
     while let Some(token) = parser.peek() {
-        match token.kind {
-            TokenKind::Star | TokenKind::Slash => {
-                let operator = parser.advance().unwrap().kind.clone(); // consume operator
+        match &token.kind {
+            TokenKind::SimpleSymbol(SimpleSymbolKind::Star)
+            | TokenKind::SimpleSymbol(SimpleSymbolKind::Slash)
+            | TokenKind::MathSymbol(_) => {
+                let operator = parser.advance().unwrap().clone();
                 let right = parse_primary(parser)?;
                 node = ASTNode::Expression(Expression::Binary {
                     left: Box::new(extract_expr(node)?),
@@ -58,9 +63,9 @@ fn parse_primary(parser: &mut Parser) -> Result<ASTNode, String> {
             TokenKind::Identifier(id) => {
                 Ok(ASTNode::Expression(Expression::Identifier(id.clone())))
             }
-            TokenKind::LeftParen => {
+            TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen) => {
                 let expr = parse_expression(parser)?;
-                parser.consume(&TokenKind::RightParen)?;
+                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
                 Ok(expr)
             }
             _ => Err(format!(
@@ -80,69 +85,3 @@ fn extract_expr(node: ASTNode) -> Result<Expression, String> {
         Err("Expected expression node".to_string())
     }
 }
-
-// pub fn parse_expression(parser: &mut Parser) -> Result<Expression, String> {
-//     parse_term(parser)
-// }
-
-// fn parse_term(parser: &mut Parser) -> Result<Expression, String> {
-//     let mut expr = parse_factor(parser)?;
-
-//     while let Some(token) = parser.peek() {
-//         match token.kind {
-//             TokenKind::Plus | TokenKind::Minus => {
-//                 let op = parser.advance().unwrap().kind.clone();
-//                 let right = parse_factor(parser)?;
-//                 expr = Expression::Binary {
-//                     left: Box::new(expr),
-//                     operator: op,
-//                     right: Box::new(right),
-//                 };
-//             }
-//             _ => break,
-//         }
-//     }
-
-//     Ok(expr)
-// }
-
-// fn parse_factor(parser: &mut Parser) -> Result<Expression, String> {
-//     let mut expr = parse_primary(parser)?;
-
-//     while let Some(token) = parser.peek() {
-//         match token.kind {
-//             TokenKind::Star | TokenKind::Slash => {
-//                 let op = parser.advance().unwrap().kind.clone();
-//                 let right = parse_primary(parser)?;
-//                 expr = Expression::Binary {
-//                     left: Box::new(expr),
-//                     operator: op,
-//                     right: Box::new(right),
-//                 };
-//             }
-//             _ => break,
-//         }
-//     }
-
-//     Ok(expr)
-// }
-
-// fn parse_primary(parser: &mut Parser) -> Result<Expression, String> {
-//     let token = parser.advance().ok_or("Unexpected end of input")?;
-//     match &token.kind {
-//         TokenKind::Int(i) => Ok(Expression::IntLiteral(*i)),
-//         TokenKind::Dec(d) => Ok(Expression::DecLiteral(*d)),
-//         TokenKind::Txt(s) => Ok(Expression::TxtLiteral(s.clone())),
-//         TokenKind::Bool(b) => Ok(Expression::BoolLiteral(*b)),
-//         TokenKind::Identifier(name) => Ok(Expression::Identifier(name.clone())),
-//         TokenKind::LeftParen => {
-//             let expr = parse_expression(parser)?;
-//             parser.consume(&TokenKind::RightParen)?;
-//             Ok(expr)
-//         }
-//         other => Err(format!(
-//             "Unexpected token {:?} at line {}, column {}",
-//             other, token.line, token.column
-//         )),
-//     }
-// }
