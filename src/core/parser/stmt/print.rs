@@ -1,6 +1,6 @@
 use crate::core::parser::ast::ASTNode;
+use crate::core::parser::parse::expr::parse_expression;
 use crate::core::parser::parse::parser::Parser;
-use crate::core::parser::stmt::var::parse_expression;
 use crate::core::lexer::token::TokenKind;
 
 pub fn parse_print_stmt(parser: &mut Parser) -> Result<ASTNode, String> {

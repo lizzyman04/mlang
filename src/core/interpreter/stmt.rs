@@ -1,5 +1,5 @@
 use super::env::Environment;
-use super::eval::eval_expression;
+use super::eval::evaluate;
 use crate::core::parser::ast::expr::ExecutionResult;
 use crate::core::parser::ast::{ASTNode, Expression};
 
@@ -7,7 +7,7 @@ pub fn execute_stmt(stmt: ASTNode, env: &mut Environment) -> Result<ExecutionRes
     match stmt {
         ASTNode::PrintStmt { expression } => {
             if let ASTNode::Expression(expr) = *expression {
-                let value = eval_expression(expr, env)?;
+                let value = evaluate(expr, env)?;
                 match value {
                     Expression::IntLiteral(i) => println!("{}", i),
                     Expression::DecLiteral(f) => println!("{}", f),
@@ -27,7 +27,9 @@ pub fn execute_stmt(stmt: ASTNode, env: &mut Environment) -> Result<ExecutionRes
             value,
         } => {
             if let ASTNode::Expression(expr) = *value {
-                let matches_type = match (&var_type[..], &expr) {
+                let evaluated = evaluate(expr.clone(), env)?;
+
+                let matches_type = match (&var_type[..], &evaluated) {
                     ("int", Expression::IntLiteral(_)) => true,
                     ("dec", Expression::DecLiteral(_)) => true,
                     ("txt", Expression::TxtLiteral(_)) => true,
@@ -42,7 +44,7 @@ pub fn execute_stmt(stmt: ASTNode, env: &mut Environment) -> Result<ExecutionRes
                     ));
                 }
 
-                env.set(name, var_type, expr);
+                env.set(name, var_type, evaluated);
                 Ok(ExecutionResult::Unit)
             } else {
                 Err("Invalid expression in variable declaration.".to_string())
@@ -51,7 +53,7 @@ pub fn execute_stmt(stmt: ASTNode, env: &mut Environment) -> Result<ExecutionRes
 
         ASTNode::ReturnStmt { value } => {
             if let ASTNode::Expression(expr) = *value {
-                let result = eval_expression(expr, env)?;
+                let result = evaluate(expr, env)?;
                 Ok(ExecutionResult::Return(result))
             } else {
                 Err("Invalid expression in return statement.".to_string())
