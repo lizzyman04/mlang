@@ -132,4 +132,4 @@ Math operations are handled via a symbolic engine that plugs directly into the i
 ---
 
 > For grammar rules, see [docs/grammar.md](grammar.md)
-> For math engine internals, see [docs/math-engine.md](math-engine.md)
+> For math engine internals, see [docs/engine.md](engine.md)

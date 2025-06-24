@@ -1,5 +1,0 @@
-main() {
-  print("Olá");
-  print(2025);
-  print(3.14);
-}

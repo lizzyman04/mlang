@@ -1,8 +1,0 @@
-main() {
-  int year = 2025;
-  dec pi = 3.14;
-  txt msg = "Ready";
-  print(msg);
-  print(year);
-  print(pi);
-}

@@ -229,6 +229,6 @@ mlang/
 
 ---
 
-> See [`math-engine.md`](math-engine.md) for math-specific behavior
+> See [`engine.md`](engine.md) for math-specific behavior
 > See [`grammar.md`](grammar.md) for syntax rules
 > See [`overview.md`](overview.md) for project structure

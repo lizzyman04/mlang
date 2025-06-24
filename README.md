@@ -1,6 +1,7 @@
 # MLang — A Math-First Programming Language
 
-**MLang** is a modern programming language focused on symbolic and numeric computation. It combines the power of structured programming with built-in support for solving algebraic and arithmetic expressions.
+**MLang** is a modern programming language focused on symbolic and numeric computation.  
+Now with a beautiful built-in IDE for editing and running `.mlang` code interactively!
 
 ---
 
@@ -9,7 +10,8 @@
 - [Overview](docs/overview.md)
 - [Language Grammar](docs/grammar.md)
 - [Runtime Architecture](docs/runtime.md)
-- [Math Engine](docs/math-engine.md)
+- [Math Engine](docs/engine.md)
+- [GUI Mode](docs/gui.md)
 - [Examples](examples/)
 - [License](LICENSE)
 
@@ -31,8 +33,16 @@ cargo build --release
 
 ### Run MLang
 
+Run from terminal:
+
 ```bash
-cargo run -- examples/hello.mlang
+cargo run -- --cli examples/hello.mlang
+```
+
+Or launch the GUI IDE:
+
+```bash
+cargo run
 ```
 
 ---

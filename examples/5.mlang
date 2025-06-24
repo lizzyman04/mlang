@@ -1,6 +1,0 @@
-main() {
-    int b = 12;
-    int exp = 3;
-    int complex = ((7 + b) * 4)^exp;
-    print(complex);
-}
