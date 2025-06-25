@@ -28,9 +28,9 @@ expr = math.solve("2x + 4 = 10");
 ### Accessing Results
 
 ```mlang
-log(expr.result());    // → 3
-log(expr.step(1));     // → "2x = 6"
-log(expr.steps());     // → ["2x + 4 = 10", "2x = 6", "x = 3"]
+print(expr.result());    // → 3
+print(expr.step(1));     // → "2x = 6"
+print(expr.steps());     // → ["2x + 4 = 10", "2x = 6", "x = 3"]
 ```
 
 ---
@@ -118,15 +118,15 @@ Every `math.solve()` call returns an expression object with the following API:
 
 ```mlang
 expr = math.solve("3x + 6 = 12");
-log(expr.steps());
+print(expr.steps());
 // → ["3x + 6 = 12", "3x = 6", "x = 2"]
 ```
 
-### Quadratic Equation (basic support)
+### Quadratic Equation
 
 ```mlang
 expr = math.solve("x^2 - 4x + 4 = 0");
-log(expr.result());
+print(expr.result());
 // → x = 2
 ```
 
@@ -144,24 +144,8 @@ MLang supports symbolic constants directly:
 
 ```mlang
 expr = math.solve("pi * r^2 = 100");
-log(expr.result()); // r = sqrt(100 / pi)
+print(expr.result()); // r = sqrt(100 / pi)
 ```
-
----
-
-## 🔄 Planned Features
-
-| Feature                      | Status         |
-| ---------------------------- | -------------- |
-| Linear equation solving      | ✅ Implemented  |
-| Step tracking                | ✅ Implemented  |
-| Symbolic constants           | ✅ Implemented  |
-| Quadratic equations          | 🔄 Partial     |
-| Simplification (`.simplify`) | 🚧 In progress |
-| Derivation (`.derivative`)   | 🚧 In progress |
-| Integration (`.integrate`)   | 🧪 Planned     |
-| Trigonometric support        | 🧪 Planned     |
-| Multi-variable equations     | 🧪 Future      |
 
 ---
 
@@ -192,7 +176,7 @@ Implemented in `src/math.rs`, integrated with the interpreter runtime.
 
 * Math operations are lazy-evaluated until `.result()` is called
 * All steps are stored in memory as snapshots of the transformation
-* Constants and known functions (`sqrt`, `log`, `abs`) are internally mapped
+* Constants and known functions (`sqrt`, `print`, `abs`) are internally mapped
 
 ---
 

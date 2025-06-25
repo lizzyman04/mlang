@@ -78,7 +78,7 @@ Statements are terminated by semicolons `;`.
 
 ```mlang
 x = 5;
-log("The result is " + x);
+print("The result is " + x);
 ```
 
 ---
@@ -97,7 +97,7 @@ for <Type> <var> = <start>; <condition>; <update> {
 
 ```mlang
 for int i = 0; i < 10; i = i + 1 {
-    log(i);
+    print(i);
 }
 ```
 
@@ -145,9 +145,9 @@ expr = math.solve("2x + 4 = 10");
 ### Post-evaluation API
 
 ```mlang
-log(expr.result());   // → 3
-log(expr.step(1));    // → "2x = 6"
-log(expr.steps());    // → ["2x + 4 = 10", "2x = 6", "x = 3"]
+print(expr.result());   // → 3
+print(expr.step(1));    // → "2x = 6"
+print(expr.steps());    // → ["2x + 4 = 10", "2x = 6", "x = 3"]
 ```
 
 Supported syntax inside math strings includes:
@@ -164,14 +164,14 @@ Future expansion: `integrate`, `derive`, `simplify`, `plot`, etc.
 ## 📤 Console Output
 
 ```mlang
-log("message");    // Output to stdout
+print("message");    // Output to stdout
 error("msg");      // Output to stderr
 ```
 
 Use `+` for string concatenation and variables:
 
 ```mlang
-log("Hello, " + name);
+print("Hello, " + name);
 ```
 
 ---
@@ -179,7 +179,7 @@ log("Hello, " + name);
 ## ⛔ Reserved Words
 
 ```
-int, dec, txt, bool, for, return, main, log, error, math, solve, step, steps, result
+int, dec, txt, bool, for, return, main, print, error, math, solve, step, steps, result
 ```
 
 > User-defined functions and variables must not use these reserved keywords.
@@ -205,10 +205,10 @@ main() {
     int b = 3;
     int sum = a + b;
 
-    log("Sum is " + sum);
+    print("Sum is " + sum);
 
     expr = math.solve("2x + 4 = 10");
-    log("x = " + expr.result());
+    print("x = " + expr.result());
 }
 ```
 
@@ -225,13 +225,12 @@ params          ::= param { "," param }
 param           ::= type identifier
 
 block           ::= "{" { statement } "}"
-statement       ::= var_decl | assign_stmt | expr_stmt | loop_stmt | return_stmt | log_stmt | error_stmt
+statement       ::= var_decl | assign_stmt | expr_stmt | loop_stmt | return_stmt | print_stmt
 var_decl        ::= type identifier "=" expression ";"
 assign_stmt     ::= identifier "=" expression ";"
 expr_stmt       ::= expression ";"
 return_stmt     ::= "return" expression ";"
-log_stmt        ::= "log(" expression ");"
-error_stmt      ::= "error(" expression ");"
+print_stmt      ::= "print(" expression ");"
 
 loop_stmt       ::= "for" type identifier "=" expression ";" expression ";" assign_stmt block
 

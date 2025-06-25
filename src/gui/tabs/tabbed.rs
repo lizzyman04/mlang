@@ -1,39 +1,28 @@
-use egui::{RichText, Ui};
+use eframe::egui::{RichText, Ui};
 
+#[derive(Default)]
 pub enum Tab {
+    #[default]
     Output,
     Errors,
 }
 
+#[derive(Default)]
 pub struct TabbedState {
     pub selected: Tab,
-}
-
-impl Default for TabbedState {
-    fn default() -> Self {
-        Self {
-            selected: Tab::Output,
-        }
-    }
 }
 
 impl TabbedState {
     pub fn ui(&mut self, ui: &mut Ui, output: &str, error: &str) {
         ui.horizontal(|ui| {
             if ui
-                .selectable_label(
-                    matches!(self.selected, Tab::Output),
-                    RichText::new("Output"),
-                )
+                .selectable_label(matches!(self.selected, Tab::Output), RichText::new("Output"))
                 .clicked()
             {
                 self.selected = Tab::Output;
             }
             if ui
-                .selectable_label(
-                    matches!(self.selected, Tab::Errors),
-                    RichText::new("Errors"),
-                )
+                .selectable_label(matches!(self.selected, Tab::Errors), RichText::new("Errors"))
                 .clicked()
             {
                 self.selected = Tab::Errors;
