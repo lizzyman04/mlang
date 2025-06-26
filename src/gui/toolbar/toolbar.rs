@@ -1,10 +1,11 @@
 use crate::gui::{
     editor::editor::Editor,
     editor::runner::run_code,
-    symbols::panel::SymbolPanel,
     tabs::tabbed::{Tab, TabbedState},
 };
-use eframe::egui::{Button, Color32, Ui, Vec2, Window};
+
+use eframe::egui::{Button, Color32, Ui, Vec2};
+use rfd::FileDialog;
 use std::fs;
 
 #[derive(Default)]
@@ -18,7 +19,6 @@ impl ToolBar {
         &mut self,
         ui: &mut Ui,
         editor: &mut Editor,
-        symbols: &mut SymbolPanel,
         output: &mut String,
         error: &mut String,
         tabs: &mut TabbedState,
@@ -40,15 +40,24 @@ impl ToolBar {
             }
 
             if ui.add(Button::new("💾 Save")).clicked() {
-                match fs::write("output.mlang", editor.get_code()) {
-                    Ok(_) => {
-                        *output = String::from("File saved successfully as output.mlang");
-                        tabs.selected = Tab::Output;
+                if let Some(path) = FileDialog::new()
+                    .add_filter("MLang File", &["mlang"])
+                    .set_file_name("main.mlang")
+                    .save_file()
+                {
+                    match fs::write(&path, editor.get_code()) {
+                        Ok(_) => {
+                            *output = format!("File saved successfully as {}", path.display());
+                            tabs.selected = Tab::Output;
+                        }
+                        Err(e) => {
+                            *error = format!("Save Error: {}", e);
+                            tabs.selected = Tab::Errors;
+                        }
                     }
-                    Err(e) => {
-                        *error = format!("Save Error: {}", e);
-                        tabs.selected = Tab::Errors;
-                    }
+                } else {
+                    *error = String::from("Save Error: No file selected");
+                    tabs.selected = Tab::Errors;
                 }
             }
 
@@ -56,26 +65,25 @@ impl ToolBar {
 
             if ui.add(Button::new("🔣 Symbols")).clicked() {
                 self.symbols_popup_open = !self.symbols_popup_open;
+                if self.symbols_popup_open {
+                    self.docs_popup_open = false;
+                }
             }
 
             if ui.add(Button::new("📖 Docs")).clicked() {
                 self.docs_popup_open = !self.docs_popup_open;
+                if self.docs_popup_open {
+                    self.symbols_popup_open = false;
+                }
             }
         });
-
-        if self.symbols_popup_open {
-            Window::new("🔣 Symbols")
-                .collapsible(false)
-                .resizable(false)
-                .fixed_size(Vec2::new(150.0, 200.0))
-                .show(ui.ctx(), |ui| {
-                    ui.visuals_mut().panel_fill = Color32::from_rgb(40, 40, 40);
-                    symbols.ui(ui, editor);
-                });
-        }
     }
 
     pub fn is_docs_popup_open(&self) -> bool {
         self.docs_popup_open
+    }
+
+    pub fn is_symbols_popup_open(&self) -> bool {
+        self.symbols_popup_open
     }
 }

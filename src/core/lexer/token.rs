@@ -1,4 +1,6 @@
-use super::symbol::{math::MathSymbolKind, simple::SimpleSymbolKind};
+use super::symbol::{
+    comparison::ComparisonSymbolKind, math::MathSymbolKind, simple::SimpleSymbolKind,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenKind {
@@ -11,6 +13,7 @@ pub enum TokenKind {
 
     MathSymbol(MathSymbolKind),
     SimpleSymbol(SimpleSymbolKind),
+    ComparisonSymbol(ComparisonSymbolKind),
 }
 
 #[derive(Debug, Clone)]
@@ -29,8 +32,9 @@ impl TokenKind {
             TokenKind::Dec(f) => format!("decimal '{}'", f),
             TokenKind::Txt(t) => format!("string \"{}\"", t),
             TokenKind::Bool(b) => format!("boolean '{}'", b),
-            TokenKind::SimpleSymbol(sym) => format!("'{}'", sym.to_char()),
             TokenKind::MathSymbol(sym) => format!("'{}'", sym.to_char()),
+            TokenKind::SimpleSymbol(sym) => format!("'{}'", sym.to_char()),
+            TokenKind::ComparisonSymbol(sym) => format!("'{}'", sym.to_str()),
             // other => format!("{:?}", other),
         }
     }

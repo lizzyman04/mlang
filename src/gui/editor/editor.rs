@@ -1,3 +1,4 @@
+use crate::gui::editor::highlighter::highlight_code;
 use eframe::egui::{
     Color32, FontFamily, FontId, RichText, ScrollArea, TextEdit, TextStyle, Ui, Vec2,
 };
@@ -54,13 +55,19 @@ impl Editor {
                     .scroll_offset(Vec2::new(0.0, scroll_offset))
                     .max_height(f32::INFINITY)
                     .show(ui, |ui| {
+                        let mut layouter = |ui: &Ui, text: &str, _wrap_width: f32| {
+                            let job = highlight_code(text);
+                            ui.fonts(|f| f.layout_job(job))
+                        };
+
                         let text_edit = TextEdit::multiline(&mut self.code)
                             .id(id)
                             .desired_width(f32::INFINITY)
                             .code_editor()
                             .font(FontId::new(14.0, FontFamily::Monospace))
                             .margin(Vec2::new(5.0, 0.0))
-                            .desired_rows(line_count);
+                            .desired_rows(line_count)
+                            .layouter(&mut layouter);
 
                         ui.style_mut().spacing.item_spacing = Vec2::new(0.0, 0.0);
                         ui.add_sized(

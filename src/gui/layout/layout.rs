@@ -55,7 +55,6 @@ impl AppLayout {
                     state.toolbar.ui(
                         ui,
                         &mut state.editor,
-                        &mut state.symbols,
                         &mut state.output,
                         &mut state.error,
                         &mut state.tabs,
@@ -67,13 +66,17 @@ impl AppLayout {
             ui.visuals_mut().panel_fill = Color32::from_rgb(25, 25, 25);
             ui.add_space(5.0);
 
-            if state.toolbar.is_docs_popup_open() {
+            if state.toolbar.is_docs_popup_open() || state.toolbar.is_symbols_popup_open() {
                 SidePanel::right("docs_viewer")
                     .resizable(true)
                     .default_width(300.0)
                     .show_inside(ui, |ui| {
                         ui.visuals_mut().panel_fill = Color32::from_rgb(20, 20, 20);
-                        state.docs.ui(ui);
+                        if state.toolbar.is_docs_popup_open() {
+                            state.docs.ui(ui);
+                        } else if state.toolbar.is_symbols_popup_open() {
+                            state.symbols.ui(ui, &mut state.editor);
+                        }
                     });
 
                 ui.vertical(|ui| {
