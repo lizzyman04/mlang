@@ -1,7 +1,9 @@
-use crate::gui::AppState;
 use eframe::egui::{
-    CentralPanel, Color32, Context, FontFamily, FontId, TextStyle, TopBottomPanel, Vec2, Visuals,
+    CentralPanel, Color32, Context, FontFamily, FontId, SidePanel, TextStyle, TopBottomPanel, Vec2,
+    Visuals,
 };
+
+use crate::gui::AppState;
 
 pub struct AppLayout {
     editor_height: Option<f32>,
@@ -56,27 +58,48 @@ impl AppLayout {
                         &mut state.symbols,
                         &mut state.output,
                         &mut state.error,
+                        &mut state.tabs,
                     );
                 });
             });
 
         CentralPanel::default().show(ctx, |ui| {
             ui.visuals_mut().panel_fill = Color32::from_rgb(25, 25, 25);
+            ui.add_space(5.0);
 
             if state.toolbar.is_docs_popup_open() {
-                state.docs.ui(ui);
-            } else {
+                SidePanel::right("docs_viewer")
+                    .resizable(true)
+                    .default_width(300.0)
+                    .show_inside(ui, |ui| {
+                        ui.visuals_mut().panel_fill = Color32::from_rgb(20, 20, 20);
+                        state.docs.ui(ui);
+                    });
+
                 ui.vertical(|ui| {
-                    ui.add_space(5.0);
-
                     let editor_height = self.editor_height.unwrap_or(ui.available_height() * 0.7);
-
                     ui.scope(|ui| {
-                        ui.set_height(editor_height);
+                        ui.set_min_height(editor_height);
+                        ui.set_max_height(editor_height);
                         state.editor.ui(ui);
                     });
 
-                    state.tabs.ui(ui, &state.output, &state.error);
+                    ui.scope(|ui| {
+                        state.tabs.ui(ui, &state.output, &state.error);
+                    });
+                });
+            } else {
+                ui.vertical(|ui| {
+                    let editor_height = self.editor_height.unwrap_or(ui.available_height() * 0.7);
+                    ui.scope(|ui| {
+                        ui.set_min_height(editor_height);
+                        ui.set_max_height(editor_height);
+                        state.editor.ui(ui);
+                    });
+
+                    ui.scope(|ui| {
+                        state.tabs.ui(ui, &state.output, &state.error);
+                    });
                 });
             }
         });

@@ -11,17 +11,17 @@ fn format_error(kind: &str, file: &str, message: &str) -> String {
     )
 }
 
-fn run_cli(file_path: &str) -> Result<(), Box<dyn Error>> {
+fn run_exe(file_path: &str) -> Result<(), Box<dyn Error>> {
     let source_code = fs::read_to_string(&file_path)
         .map_err(|_| format_error("Could not read file", &file_path, ""))?;
 
     let tokens = tokenize(&source_code)
-        .map_err(|e| format_error("Lexer Error", &file_path, &e.to_string()))?;
+        .map_err(|e| format_error("Lexing Error", &file_path, &e.to_string()))?;
 
     let ast = entry::parse(tokens)
-        .map_err(|e| format_error("Parser Error", &file_path, &e.to_string()))?;
+        .map_err(|e| format_error("Parsing Error", &file_path, &e.to_string()))?;
 
-    execute(ast).map_err(|e| format_error("Runtime Error", &file_path, &e.to_string()))?;
+    execute(ast, None).map_err(|e| format_error("Runtime Error", &file_path, &e.to_string()))?;
 
     Ok(())
 }
@@ -38,7 +38,7 @@ fn main() -> eframe::Result<()> {
 
             println!("\n============ MLang — A Math-First Programming Language ============\n");
 
-            let exit_code = match run_cli(&file) {
+            let exit_code = match run_exe(&file) {
                 Ok(_) => 0,
                 Err(err) => {
                     eprintln!("{}", err);
@@ -56,6 +56,8 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "MLang IDE",
         options,
-Box::new(|_cc| Ok::<_, Box<dyn std::error::Error + Send + Sync>>(Box::new(gui::AppState::default())))
+        Box::new(|_cc| {
+            Ok::<_, Box<dyn std::error::Error + Send + Sync>>(Box::new(gui::AppState::default()))
+        }),
     )
 }

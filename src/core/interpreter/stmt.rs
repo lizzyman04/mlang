@@ -3,18 +3,29 @@ use super::eval::evaluate;
 use crate::core::parser::ast::expr::ExecutionResult;
 use crate::core::parser::ast::{ASTNode, Expression};
 
-pub fn execute_stmt(stmt: ASTNode, env: &mut Environment) -> Result<ExecutionResult, String> {
+pub fn execute_stmt(
+    stmt: ASTNode,
+    env: &mut Environment,
+    output: Option<&mut &mut String>,
+) -> Result<ExecutionResult, String> {
     match stmt {
         ASTNode::PrintStmt { expression } => {
             if let ASTNode::Expression(expr) = *expression {
                 let value = evaluate(expr, env)?;
-                match value {
-                    Expression::IntLiteral(i) => println!("{}", i),
-                    Expression::DecLiteral(f) => println!("{}", f),
-                    Expression::BoolLiteral(b) => println!("{}", b),
-                    Expression::TxtLiteral(s) => println!("{}", s),
+                let output_str = match value {
+                    Expression::IntLiteral(i) => format!("{}\n", i),
+                    Expression::DecLiteral(f) => format!("{}\n", f),
+                    Expression::BoolLiteral(b) => format!("{}\n", b),
+                    Expression::TxtLiteral(s) => format!("{}\n", s),
                     _ => return Err("Unsupported expression type in print.".to_string()),
+                };
+
+                if let Some(out) = output {
+                    out.push_str(&output_str);
+                } else {
+                    print!("{}", output_str);
                 }
+
                 Ok(ExecutionResult::Unit)
             } else {
                 Err("Expected expression in print.".to_string())
@@ -29,9 +40,7 @@ pub fn execute_stmt(stmt: ASTNode, env: &mut Environment) -> Result<ExecutionRes
             if let ASTNode::Expression(expr) = *value {
                 let evaluated = match evaluate(expr.clone(), env) {
                     Ok(val) => val,
-                    Err(e) => {
-                        return Err(e);
-                    }
+                    Err(e) => return Err(e),
                 };
 
                 let matches_type = match (&var_type[..], &evaluated) {

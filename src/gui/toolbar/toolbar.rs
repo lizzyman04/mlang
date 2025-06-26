@@ -1,5 +1,11 @@
-use crate::gui::{editor::editor::Editor, symbols::panel::SymbolPanel};
+use crate::gui::{
+    editor::editor::Editor,
+    editor::runner::run_code,
+    symbols::panel::SymbolPanel,
+    tabs::tabbed::{Tab, TabbedState},
+};
 use eframe::egui::{Button, Color32, Ui, Vec2, Window};
+use std::fs;
 
 #[derive(Default)]
 pub struct ToolBar {
@@ -15,6 +21,7 @@ impl ToolBar {
         symbols: &mut SymbolPanel,
         output: &mut String,
         error: &mut String,
+        tabs: &mut TabbedState,
     ) {
         ui.horizontal(|ui| {
             ui.visuals_mut().widgets.inactive.bg_fill = Color32::from_rgb(50, 50, 50);
@@ -22,18 +29,27 @@ impl ToolBar {
             ui.style_mut().spacing.button_padding = Vec2::new(8.0, 4.0);
 
             if ui.add(Button::new("▶️ Run")).clicked() {
-                *output = String::from("Executando código... (em breve)");
-                *error = String::from("");
+                tabs.selected = run_code(editor.get_code(), output, error);
             }
 
             if ui.add(Button::new("🗑 Clear")).clicked() {
                 editor.clear();
                 *output = String::from("");
                 *error = String::from("");
+                tabs.selected = Tab::Output;
             }
 
             if ui.add(Button::new("💾 Save")).clicked() {
-                *output = String::from("Salvando arquivo... (em breve)");
+                match fs::write("output.mlang", editor.get_code()) {
+                    Ok(_) => {
+                        *output = String::from("File saved successfully as output.mlang");
+                        tabs.selected = Tab::Output;
+                    }
+                    Err(e) => {
+                        *error = format!("Save Error: {}", e);
+                        tabs.selected = Tab::Errors;
+                    }
+                }
             }
 
             ui.add_space(10.0);

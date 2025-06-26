@@ -1,11 +1,10 @@
+use super::env::Environment;
+use super::stmt::execute_stmt;
 use crate::core::lexer::rules::infer_type_expr;
 use crate::core::parser::ast::ASTNode;
 use crate::core::parser::ast::expr::ExecutionResult;
 
-use super::env::Environment;
-use super::stmt::execute_stmt;
-
-pub fn execute(program: Vec<ASTNode>) -> Result<(), String> {
+pub fn execute(program: Vec<ASTNode>, mut output: Option<&mut String>) -> Result<(), String> {
     let mut env = Environment::new();
 
     for node in program {
@@ -22,7 +21,7 @@ pub fn execute(program: Vec<ASTNode>) -> Result<(), String> {
                 }
 
                 for stmt in body {
-                    match execute_stmt(stmt, &mut env)? {
+                    match execute_stmt(stmt, &mut env, output.as_mut().map(|o| o))? {
                         ExecutionResult::Return(value) => {
                             if return_type != "void" && return_type != infer_type_expr(&value) {
                                 return Err(format!(
