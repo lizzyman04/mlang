@@ -1,12 +1,13 @@
 use super::expr::Expression;
+use super::types::Type;
 
 #[derive(Debug, Clone)]
 pub enum ASTNode {
     FunctionDecl {
         name: String,
         body: Vec<ASTNode>,
-        return_type: String,
-        params: Vec<(String, String)>,
+        return_type: Type,
+        params: Vec<(Type, String)>,
     },
     ReturnStmt {
         value: Box<ASTNode>,
@@ -16,9 +17,18 @@ pub enum ASTNode {
     },
     VarDecl {
         name: String,
-        var_type: String,
+        var_type: Type,
         value: Box<ASTNode>,
     },
+    LetDecl {
+        name: String,
+        value: Box<ASTNode>,
+    },
+    IndexAssign {
+        name: String,
+        index: Box<ASTNode>,
+        value: Box<ASTNode>,
+    },
+    ExprStmt(Box<ASTNode>),
     Expression(Expression),
 }
-

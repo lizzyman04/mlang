@@ -12,10 +12,28 @@ pub enum Expression {
         operator: Token,
         right: Box<Expression>,
     },
+    Unary {
+        operator: Token,
+        operand: Box<Expression>,
+    },
+    Logical {
+        left: Box<Expression>,
+        operator: Token,
+        right: Box<Expression>,
+    },
+    ArrayLiteral(Vec<Expression>),
+    ArrayAccess {
+        array: Box<Expression>,
+        index: Box<Expression>,
+    },
+    MethodCall {
+        object: Box<Expression>,
+        method: String,
+        args: Vec<Expression>,
+    },
 }
 
 pub enum ExecutionResult {
-    // Value(String),
     Unit,
     Return(Expression),
 }

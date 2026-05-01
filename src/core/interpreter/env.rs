@@ -1,9 +1,8 @@
 use std::collections::HashMap;
-use crate::core::parser::ast::Expression;
+use crate::core::parser::ast::{Expression, Type};
 
-#[derive(Debug)]
 pub struct Environment {
-    variables: HashMap<String, (String, Expression)>,
+    variables: HashMap<String, (Type, Expression)>,
 }
 
 impl Environment {
@@ -13,11 +12,11 @@ impl Environment {
         }
     }
 
-    pub fn set(&mut self, name: String, var_type: String, value: Expression) {
+    pub fn set(&mut self, name: String, var_type: Type, value: Expression) {
         self.variables.insert(name, (var_type, value));
     }
 
-    pub fn get(&self, name: &str) -> Option<&(String, Expression)> {
+    pub fn get(&self, name: &str) -> Option<&(Type, Expression)> {
         self.variables.get(name)
     }
 }
