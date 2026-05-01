@@ -3,6 +3,17 @@ use crate::core::parser::ast::ASTNode;
 use crate::core::parser::parse::parser::Parser;
 use crate::core::parser::stmt::parse_statement;
 
+pub fn parse_stmts(tokens: Vec<Token>) -> Result<Vec<ASTNode>, String> {
+    let mut parser = Parser::new(tokens);
+    let mut stmts = Vec::new();
+
+    while !parser.is_at_end() {
+        stmts.push(parse_statement(&mut parser)?);
+    }
+
+    Ok(stmts)
+}
+
 pub fn parse(tokens: Vec<Token>) -> Result<Vec<ASTNode>, String> {
     let mut parser = Parser::new(tokens);
     let mut functions = Vec::new();

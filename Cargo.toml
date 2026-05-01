@@ -3,10 +3,10 @@ name = "mlang"
 version = "0.1.0"
 edition = "2024"
 
-[dependencies]
-clap = { version = "4.5.40", features = ["derive"] }
-eframe = "0.31.1"
-egui = "0.31.1"
-egui_commonmark = "0.20.0"
-egui_extras = "0.31.1"
-rfd = "0.15.3"
+[lib]
+name = "mlang"
+path = "src/lib.rs"
+
+[[bin]]
+name = "mlang"
+path = "src/bin/mlang.rs"
