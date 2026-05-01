@@ -1,0 +1,53 @@
+main() {
+  # Test 1: Basic array and element access
+  array<int> nums = [1, 2, 3, 4, 5];
+  print(nums[2]);
+
+  # Test 2: Index assignment
+  nums[1] = 10;
+  print(nums[1]);
+
+  # Test 3: push / len / pop
+  nums.push(6);
+  print(nums.len());
+
+  let last = nums.pop();
+  print(last);
+  print(nums.len());
+
+  # Test 4: Nested arrays
+  array<array<int>> matrix = [[1, 2], [3, 4]];
+  print(matrix[0][1]);
+
+  # Test 5: contains and slice
+  array<int> a = [10, 20, 30, 40, 50];
+  print(a.contains(30));
+  let sub = a.slice(1, 3);
+  print(sub[0]);
+
+  # Test 6: dec array with int coercion
+  array<dec> measures = [1, 2.5, 3];
+  print(measures[0]);
+
+  # Test 7: txt concatenation
+  txt greeting = "Hello" + ", " + "MLang!";
+  print(greeting);
+
+  # Test 8: boolean operators
+  bool x = true;
+  bool y = false;
+  print(x && y);
+  print(x || y);
+  print(!x);
+
+  # Test 9: int -> dec coercion in variable
+  dec pi = 3;
+  print(pi);
+
+  # Test 10: comparison
+  int val = 5;
+  print(val > 3);
+  print(val == 5);
+
+  print("All array tests passed");
+}
