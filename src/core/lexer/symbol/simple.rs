@@ -4,13 +4,19 @@ pub enum SimpleSymbolKind {
     RightParen,
     LeftBrace,
     RightBrace,
+    LeftBracket,
+    RightBracket,
     Semicolon,
     Comma,
+    Dot,
     Plus,
     Minus,
     Star,
     Slash,
     Equal,
+    Not,
+    And,
+    Or,
     Eof,
 }
 
@@ -21,31 +27,45 @@ impl SimpleSymbolKind {
             ')' => Some(SimpleSymbolKind::RightParen),
             '{' => Some(SimpleSymbolKind::LeftBrace),
             '}' => Some(SimpleSymbolKind::RightBrace),
+            '[' => Some(SimpleSymbolKind::LeftBracket),
+            ']' => Some(SimpleSymbolKind::RightBracket),
             ';' => Some(SimpleSymbolKind::Semicolon),
             ',' => Some(SimpleSymbolKind::Comma),
+            '.' => Some(SimpleSymbolKind::Dot),
             '+' => Some(SimpleSymbolKind::Plus),
             '-' => Some(SimpleSymbolKind::Minus),
             '*' => Some(SimpleSymbolKind::Star),
             '/' => Some(SimpleSymbolKind::Slash),
             '=' => Some(SimpleSymbolKind::Equal),
+            '!' => Some(SimpleSymbolKind::Not),
             _ => None,
         }
     }
 
-    pub fn to_char(&self) -> char {
+    pub fn to_display(&self) -> &'static str {
         match self {
-            SimpleSymbolKind::LeftParen => '(',
-            SimpleSymbolKind::RightParen => ')',
-            SimpleSymbolKind::LeftBrace => '{',
-            SimpleSymbolKind::RightBrace => '}',
-            SimpleSymbolKind::Semicolon => ';',
-            SimpleSymbolKind::Comma => ',',
-            SimpleSymbolKind::Plus => '+',
-            SimpleSymbolKind::Minus => '-',
-            SimpleSymbolKind::Star => '*',
-            SimpleSymbolKind::Slash => '/',
-            SimpleSymbolKind::Equal => '=',
-            SimpleSymbolKind::Eof => ' ',
+            SimpleSymbolKind::LeftParen => "(",
+            SimpleSymbolKind::RightParen => ")",
+            SimpleSymbolKind::LeftBrace => "{",
+            SimpleSymbolKind::RightBrace => "}",
+            SimpleSymbolKind::LeftBracket => "[",
+            SimpleSymbolKind::RightBracket => "]",
+            SimpleSymbolKind::Semicolon => ";",
+            SimpleSymbolKind::Comma => ",",
+            SimpleSymbolKind::Dot => ".",
+            SimpleSymbolKind::Plus => "+",
+            SimpleSymbolKind::Minus => "-",
+            SimpleSymbolKind::Star => "*",
+            SimpleSymbolKind::Slash => "/",
+            SimpleSymbolKind::Equal => "=",
+            SimpleSymbolKind::Not => "!",
+            SimpleSymbolKind::And => "&&",
+            SimpleSymbolKind::Or => "||",
+            SimpleSymbolKind::Eof => "EOF",
         }
+    }
+
+    pub fn to_char(&self) -> char {
+        self.to_display().chars().next().unwrap_or('\0')
     }
 }

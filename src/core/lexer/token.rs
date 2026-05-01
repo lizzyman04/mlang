@@ -33,9 +33,8 @@ impl TokenKind {
             TokenKind::Txt(t) => format!("string \"{}\"", t),
             TokenKind::Bool(b) => format!("boolean '{}'", b),
             TokenKind::MathSymbol(sym) => format!("'{}'", sym.to_char()),
-            TokenKind::SimpleSymbol(sym) => format!("'{}'", sym.to_char()),
+            TokenKind::SimpleSymbol(sym) => format!("'{}'", sym.to_display()),
             TokenKind::ComparisonSymbol(sym) => format!("'{}'", sym.to_str()),
-            // other => format!("{:?}", other),
         }
     }
 }

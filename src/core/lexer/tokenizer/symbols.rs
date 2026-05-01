@@ -13,11 +13,29 @@ pub fn read_symbol(
     let first = chars.next().unwrap();
     let second = chars.peek().copied();
 
+    // Two-character logical operators
+    if first == '&' && second == Some('&') {
+        chars.next();
+        return Ok(Some(Token {
+            kind: TokenKind::SimpleSymbol(SimpleSymbolKind::And),
+            line,
+            column,
+        }));
+    }
+    if first == '|' && second == Some('|') {
+        chars.next();
+        return Ok(Some(Token {
+            kind: TokenKind::SimpleSymbol(SimpleSymbolKind::Or),
+            line,
+            column,
+        }));
+    }
+
+    // Comparison operators (includes !=, ==, <=, >=, <, >)
     if let Some(comp) = ComparisonSymbolKind::from_pair(first, second) {
         if matches!(first, '=' | '!' | '<' | '>') && second == Some('=') {
             chars.next();
         }
-
         return Ok(Some(Token {
             kind: TokenKind::ComparisonSymbol(comp),
             line,
@@ -25,6 +43,7 @@ pub fn read_symbol(
         }));
     }
 
+    // Single-character operators (includes !, [, ], ., etc.)
     let kind = if let Some(simple) = SimpleSymbolKind::from_char(first) {
         TokenKind::SimpleSymbol(simple)
     } else if let Some(math) = MathSymbolKind::from_char(first) {
