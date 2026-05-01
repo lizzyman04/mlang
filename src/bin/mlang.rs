@@ -69,9 +69,10 @@ fn run_repl() {
     let mut env = Environment::new();
     let mut buffer = String::new();
     let mut brace_depth: i32 = 0;
+    let mut bracket_depth: i32 = 0;
 
     loop {
-        let prompt = if brace_depth > 0 { "..  " } else { ">>  " };
+        let prompt = if brace_depth > 0 || bracket_depth > 0 { "..  " } else { ">>  " };
         print!("{}", color("32", prompt));
         io::stdout().flush().unwrap();
 
@@ -87,7 +88,7 @@ fn run_repl() {
             break;
         }
 
-        if trimmed.is_empty() && brace_depth == 0 {
+        if trimmed.is_empty() && brace_depth == 0 && bracket_depth == 0 {
             continue;
         }
 
@@ -95,6 +96,8 @@ fn run_repl() {
             match ch {
                 '{' => brace_depth += 1,
                 '}' => brace_depth -= 1,
+                '[' => bracket_depth += 1,
+                ']' => bracket_depth -= 1,
                 _ => {}
             }
         }
@@ -104,7 +107,7 @@ fn run_repl() {
         }
         buffer.push_str(trimmed);
 
-        if brace_depth > 0 {
+        if brace_depth > 0 || bracket_depth > 0 {
             continue;
         }
 
