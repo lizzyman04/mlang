@@ -4,9 +4,70 @@ use crate::core::parser::ast::{ASTNode, Expression};
 use crate::core::parser::parse::parser::Parser;
 
 pub fn parse_expression(parser: &mut Parser) -> Result<ASTNode, String> {
-    parse_term(parser)
+    parse_or(parser)
 }
 
+// || (lowest precedence)
+fn parse_or(parser: &mut Parser) -> Result<ASTNode, String> {
+    let mut node = parse_and(parser)?;
+
+    while let Some(token) = parser.peek() {
+        if token.kind != TokenKind::SimpleSymbol(SimpleSymbolKind::Or) {
+            break;
+        }
+        let operator = parser.advance().unwrap().clone();
+        let right = parse_and(parser)?;
+        node = ASTNode::Expression(Expression::Logical {
+            left: Box::new(extract_expr(node)?),
+            operator,
+            right: Box::new(extract_expr(right)?),
+        });
+    }
+
+    Ok(node)
+}
+
+// &&
+fn parse_and(parser: &mut Parser) -> Result<ASTNode, String> {
+    let mut node = parse_comparison(parser)?;
+
+    while let Some(token) = parser.peek() {
+        if token.kind != TokenKind::SimpleSymbol(SimpleSymbolKind::And) {
+            break;
+        }
+        let operator = parser.advance().unwrap().clone();
+        let right = parse_comparison(parser)?;
+        node = ASTNode::Expression(Expression::Logical {
+            left: Box::new(extract_expr(node)?),
+            operator,
+            right: Box::new(extract_expr(right)?),
+        });
+    }
+
+    Ok(node)
+}
+
+// ==, !=, <, >, <=, >=
+fn parse_comparison(parser: &mut Parser) -> Result<ASTNode, String> {
+    let mut node = parse_term(parser)?;
+
+    while let Some(token) = parser.peek() {
+        if !matches!(token.kind, TokenKind::ComparisonSymbol(_)) {
+            break;
+        }
+        let operator = parser.advance().unwrap().clone();
+        let right = parse_term(parser)?;
+        node = ASTNode::Expression(Expression::Binary {
+            left: Box::new(extract_expr(node)?),
+            operator,
+            right: Box::new(extract_expr(right)?),
+        });
+    }
+
+    Ok(node)
+}
+
+// +, -
 fn parse_term(parser: &mut Parser) -> Result<ASTNode, String> {
     let mut node = parse_factor(parser)?;
 
@@ -30,8 +91,9 @@ fn parse_term(parser: &mut Parser) -> Result<ASTNode, String> {
     Ok(node)
 }
 
+// *, /
 fn parse_factor(parser: &mut Parser) -> Result<ASTNode, String> {
-    let mut node = parse_primary(parser)?;
+    let mut node = parse_unary(parser)?;
 
     while let Some(token) = parser.peek() {
         match &token.kind {
@@ -39,7 +101,7 @@ fn parse_factor(parser: &mut Parser) -> Result<ASTNode, String> {
             | TokenKind::SimpleSymbol(SimpleSymbolKind::Slash)
             | TokenKind::MathSymbol(_) => {
                 let operator = parser.advance().unwrap().clone();
-                let right = parse_primary(parser)?;
+                let right = parse_unary(parser)?;
                 node = ASTNode::Expression(Expression::Binary {
                     left: Box::new(extract_expr(node)?),
                     operator,
@@ -53,7 +115,100 @@ fn parse_factor(parser: &mut Parser) -> Result<ASTNode, String> {
     Ok(node)
 }
 
+// !, unary -
+fn parse_unary(parser: &mut Parser) -> Result<ASTNode, String> {
+    if let Some(token) = parser.peek() {
+        match &token.kind {
+            TokenKind::SimpleSymbol(SimpleSymbolKind::Not)
+            | TokenKind::SimpleSymbol(SimpleSymbolKind::Minus) => {
+                let operator = parser.advance().unwrap().clone();
+                let operand = parse_unary(parser)?;
+                return Ok(ASTNode::Expression(Expression::Unary {
+                    operator,
+                    operand: Box::new(extract_expr(operand)?),
+                }));
+            }
+            _ => {}
+        }
+    }
+    parse_postfix(parser)
+}
+
+// expr[index], expr.method(args)
+fn parse_postfix(parser: &mut Parser) -> Result<ASTNode, String> {
+    let mut node = parse_primary(parser)?;
+
+    loop {
+        match parser.peek().map(|t| &t.kind) {
+            Some(TokenKind::SimpleSymbol(SimpleSymbolKind::LeftBracket)) => {
+                parser.advance();
+                let index_node = parse_expression(parser)?;
+                let index = extract_expr(index_node)?;
+                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightBracket))?;
+                let array = extract_expr(node)?;
+                node = ASTNode::Expression(Expression::ArrayAccess {
+                    array: Box::new(array),
+                    index: Box::new(index),
+                });
+            }
+            Some(TokenKind::SimpleSymbol(SimpleSymbolKind::Dot)) => {
+                parser.advance();
+                let method = {
+                    let tok = parser.advance().ok_or("Expected method name after '.'")?;
+                    match &tok.kind {
+                        TokenKind::Identifier(m) => m.clone(),
+                        _ => {
+                            return Err(format!(
+                                "Expected method name after '.', found {}",
+                                tok.kind.display()
+                            ))
+                        }
+                    }
+                };
+                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen))?;
+                let mut args = Vec::new();
+                while !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen)) {
+                    let arg = extract_expr(parse_expression(parser)?)?;
+                    args.push(arg);
+                    if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::Comma)) {
+                        parser.advance();
+                    } else {
+                        break;
+                    }
+                }
+                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
+                let object = extract_expr(node)?;
+                node = ASTNode::Expression(Expression::MethodCall {
+                    object: Box::new(object),
+                    method,
+                    args,
+                });
+            }
+            _ => break,
+        }
+    }
+
+    Ok(node)
+}
+
 fn parse_primary(parser: &mut Parser) -> Result<ASTNode, String> {
+    // Array literal
+    if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftBracket)) {
+        parser.advance();
+        let mut elements = Vec::new();
+        while !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightBracket)) {
+            let elem = extract_expr(parse_expression(parser)?)?;
+            elements.push(elem);
+            if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::Comma)) {
+                parser.advance();
+            } else {
+                break;
+            }
+        }
+        parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightBracket))?;
+        return Ok(ASTNode::Expression(Expression::ArrayLiteral(elements)));
+    }
+
     if let Some(token) = parser.advance() {
         match &token.kind {
             TokenKind::Int(i) => Ok(ASTNode::Expression(Expression::IntLiteral(*i))),
@@ -68,17 +223,17 @@ fn parse_primary(parser: &mut Parser) -> Result<ASTNode, String> {
                 parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
                 Ok(expr)
             }
-            _ => Err(format!(
-                "Unexpected token {:?} at line {}, column {}",
-                token.kind, token.line, token.column
+            other => Err(format!(
+                "Unexpected token {} in expression",
+                other.display()
             )),
         }
     } else {
-        Err("Unexpected end of input.".to_string())
+        Err("Unexpected end of input in expression".to_string())
     }
 }
 
-fn extract_expr(node: ASTNode) -> Result<Expression, String> {
+pub fn extract_expr(node: ASTNode) -> Result<Expression, String> {
     if let ASTNode::Expression(expr) = node {
         Ok(expr)
     } else {
