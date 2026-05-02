@@ -43,6 +43,15 @@ pub fn read_symbol(
         }));
     }
 
+    if first == '.' && second == Some('.') {
+        chars.next();
+        return Ok(Some(Token {
+            kind: TokenKind::SimpleSymbol(SimpleSymbolKind::DotDot),
+            line,
+            column,
+        }));
+    }
+
     // Single-character operators (includes !, [, ], ., etc.)
     let kind = if let Some(simple) = SimpleSymbolKind::from_char(first) {
         TokenKind::SimpleSymbol(simple)

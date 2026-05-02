@@ -17,6 +17,7 @@ pub enum SimpleSymbolKind {
     Not,
     And,
     Or,
+    DotDot,
     Eof,
 }
 
@@ -61,6 +62,7 @@ impl SimpleSymbolKind {
             SimpleSymbolKind::Not => "!",
             SimpleSymbolKind::And => "&&",
             SimpleSymbolKind::Or => "||",
+            SimpleSymbolKind::DotDot => "..",
             SimpleSymbolKind::Eof => "EOF",
         }
     }
