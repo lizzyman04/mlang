@@ -35,8 +35,34 @@ pub fn parse_statement(parser: &mut Parser) -> Result<ASTNode, String> {
             TokenKind::Keyword(ref kw) if kw == "struct" => parse_struct_decl(parser),
             TokenKind::Keyword(ref kw) if is_variable_type(kw) => {
                 let base = kw.clone();
-                parser.advance();
-                parse_var_or_function_decl(parser, &base)
+                // int(x), dec(x), txt(x) used as cast expression statements
+                if matches!(base.as_str(), "int" | "dec" | "txt")
+                    && matches!(
+                        parser.peek_ahead(1).map(|t| &t.kind),
+                        Some(TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen))
+                    )
+                {
+                    let name = base;
+                    parser.advance(); // consume type keyword
+                    parser.advance(); // consume `(`
+                    let mut args = Vec::new();
+                    while !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen)) {
+                        args.push(extract_expr(parse_expression(parser)?)?);
+                        if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::Comma)) {
+                            parser.advance();
+                        } else {
+                            break;
+                        }
+                    }
+                    parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
+                    parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Semicolon))?;
+                    Ok(ASTNode::ExprStmt(Box::new(ASTNode::Expression(
+                        Expression::FnCall { name, args },
+                    ))))
+                } else {
+                    parser.advance();
+                    parse_var_or_function_decl(parser, &base)
+                }
             }
             // Struct-typed function declaration: `StructName funcName(...)`
             TokenKind::Identifier(_)

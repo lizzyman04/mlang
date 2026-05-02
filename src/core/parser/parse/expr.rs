@@ -277,6 +277,27 @@ fn parse_primary(parser: &mut Parser) -> Result<ASTNode, String> {
                 parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
                 Ok(expr)
             }
+            TokenKind::Keyword(kw) if matches!(kw.as_str(), "int" | "dec" | "txt") => {
+                let name = kw.clone();
+                if !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen)) {
+                    return Err(format!(
+                        "'{}' is a type keyword; use '{}(value)' to convert",
+                        name, name
+                    ));
+                }
+                parser.advance(); // consume `(`
+                let mut args = Vec::new();
+                while !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen)) {
+                    args.push(extract_expr(parse_expression(parser)?)?);
+                    if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::Comma)) {
+                        parser.advance();
+                    } else {
+                        break;
+                    }
+                }
+                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
+                Ok(ASTNode::Expression(Expression::FnCall { name, args }))
+            }
             other => Err(format!(
                 "Unexpected token {} in expression",
                 other.display()
