@@ -1,4 +1,5 @@
 use crate::core::interpreter::env::Environment;
+use crate::core::interpreter::stmt::execute_stmt;
 use crate::core::lexer::rules::infer_type;
 use crate::core::lexer::symbol::comparison::ComparisonSymbolKind;
 use crate::core::lexer::symbol::simple::SimpleSymbolKind;
@@ -172,7 +173,47 @@ pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, S
             }
         }
 
-        FnCall { name, .. } => Err(format!("Function '{}' not yet callable", name)),
+        FnCall { name, args } => {
+            let func = env
+                .get_function(&name)
+                .ok_or_else(|| format!("Undefined function '{}'", name))?
+                .clone();
+
+            if args.len() != func.params.len() {
+                return Err(format!(
+                    "Function '{}' expects {} argument(s), got {}",
+                    name,
+                    func.params.len(),
+                    args.len()
+                ));
+            }
+
+            let evaled_args = args
+                .into_iter()
+                .map(|a| evaluate(a, env))
+                .collect::<Result<Vec<_>, _>>()?;
+
+            let mut call_env = env.child_for_call();
+            for ((param_type, param_name), arg_val) in func.params.iter().zip(evaled_args) {
+                let coerced = coerce_value(param_type, arg_val)?;
+                call_env.set(param_name.clone(), param_type.clone(), coerced);
+            }
+
+            for stmt in func.body {
+                match execute_stmt(stmt, &mut call_env, None)? {
+                    crate::core::parser::ast::expr::ExecutionResult::Return(val) => {
+                        return Ok(val)
+                    }
+                    crate::core::parser::ast::expr::ExecutionResult::Unit => {}
+                    crate::core::parser::ast::expr::ExecutionResult::Break
+                    | crate::core::parser::ast::expr::ExecutionResult::Continue => {
+                        return Err("break/continue outside loop".to_string())
+                    }
+                }
+            }
+
+            Ok(Expression::IntLiteral(0))
+        }
     }
 }
 
