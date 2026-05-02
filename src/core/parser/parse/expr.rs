@@ -216,7 +216,23 @@ fn parse_primary(parser: &mut Parser) -> Result<ASTNode, String> {
             TokenKind::Bool(b) => Ok(ASTNode::Expression(Expression::BoolLiteral(*b))),
             TokenKind::Txt(s) => Ok(ASTNode::Expression(Expression::TxtLiteral(s.clone()))),
             TokenKind::Identifier(id) => {
-                Ok(ASTNode::Expression(Expression::Identifier(id.clone())))
+                let name = id.clone();
+                if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen)) {
+                    parser.advance(); // consume `(`
+                    let mut args = Vec::new();
+                    while !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen)) {
+                        args.push(extract_expr(parse_expression(parser)?)?);
+                        if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::Comma)) {
+                            parser.advance();
+                        } else {
+                            break;
+                        }
+                    }
+                    parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
+                    Ok(ASTNode::Expression(Expression::FnCall { name, args }))
+                } else {
+                    Ok(ASTNode::Expression(Expression::Identifier(name)))
+                }
             }
             TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen) => {
                 let expr = parse_expression(parser)?;

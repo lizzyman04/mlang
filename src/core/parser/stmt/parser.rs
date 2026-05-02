@@ -80,6 +80,23 @@ fn parse_ident_stmt(parser: &mut Parser) -> Result<ASTNode, String> {
     };
 
     match parser.peek().map(|t| t.kind.clone()) {
+        Some(TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen)) => {
+            parser.advance(); // consume `(`
+            let mut args = Vec::new();
+            while !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen)) {
+                args.push(extract_expr(parse_expression(parser)?)?);
+                if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::Comma)) {
+                    parser.advance();
+                } else {
+                    break;
+                }
+            }
+            parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
+            parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Semicolon))?;
+            Ok(ASTNode::ExprStmt(Box::new(ASTNode::Expression(
+                Expression::FnCall { name, args },
+            ))))
+        }
         Some(TokenKind::SimpleSymbol(SimpleSymbolKind::LeftBracket)) => {
             parser.advance(); // consume `[`
             let index = extract_expr(parse_expression(parser)?)?;

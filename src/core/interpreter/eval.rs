@@ -171,6 +171,8 @@ pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, S
                 m => Err(format!("Unknown method '{}'", m)),
             }
         }
+
+        FnCall { name, .. } => Err(format!("Function '{}' not yet callable", name)),
     }
 }
 
