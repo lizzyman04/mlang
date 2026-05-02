@@ -16,14 +16,17 @@ case "$OS" in
     linux)
         FILENAME="mlang"
         INSTALL_DIR="/usr/local/bin"
+        SUDO="sudo"
         ;;
     darwin)
         FILENAME="mlang"
         INSTALL_DIR="/usr/local/bin"
+        SUDO="sudo"
         ;;
     msys*|mingw*|cygwin*)
         FILENAME="mlang.exe"
         INSTALL_DIR="$HOME/bin"
+        SUDO=""
         ;;
     *)
         echo "error: unsupported OS: $OS" >&2
@@ -34,14 +37,14 @@ esac
 URL="https://github.com/$REPO/releases/download/$VERSION/$FILENAME"
 
 echo "Downloading MLang $VERSION..."
-mkdir -p "$INSTALL_DIR"
+$SUDO mkdir -p "$INSTALL_DIR"
 
-if ! curl -fsSL "$URL" -o "$INSTALL_DIR/$FILENAME"; then
+if ! $SUDO curl -fsSL "$URL" -o "$INSTALL_DIR/$FILENAME"; then
     echo "error: download failed from $URL" >&2
     exit 1
 fi
 
-chmod +x "$INSTALL_DIR/$FILENAME"
+$SUDO chmod +x "$INSTALL_DIR/$FILENAME"
 
 echo "MLang $VERSION installed to $INSTALL_DIR/$FILENAME"
 
