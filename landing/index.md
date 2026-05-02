@@ -19,8 +19,8 @@ features:
     details: Every variable has an explicit type — int, dec, txt, bool, array, or struct. No runtime surprises.
 
   - icon: ⚡
-    title: Fast Interpreter
-    details: Written entirely in Rust. Lexer → Parser → AST → Evaluator pipeline with zero external runtime dependencies.
+    title: Fast & Lightweight
+    details: Lexer → Parser → AST → Evaluator pipeline with zero external runtime dependencies. Starts instantly.
 
   - icon: 🏗️
     title: Structs & Functions
@@ -61,4 +61,10 @@ main() {
     txt name = read("Your name: ");
     print("Hello, " + name);
 }
+```
+
+## Install
+
+```bash
+curl -fsSL https://lizzyman04.github.io/mlang/install.sh | sh
 ```

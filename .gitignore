@@ -3,3 +3,7 @@
 /target
 **/*.rs.bk
 Cargo.lock
+
+# VitePress
+landing/node_modules/
+landing/.vitepress/dist/
