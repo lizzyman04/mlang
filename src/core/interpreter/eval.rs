@@ -196,7 +196,7 @@ pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, S
 
         FnCall { name, args } => {
             match name.as_str() {
-                "read" | "read_int" | "read_dec" => {
+                "read" => {
                     let prompt = if let Some(arg) = args.into_iter().next() {
                         Some(evaluate(arg, env)?)
                     } else {
@@ -211,18 +211,15 @@ pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, S
                     let mut input = String::new();
                     io::stdin().read_line(&mut input).map_err(|e| e.to_string())?;
                     let trimmed = input.trim().to_string();
-                    return match name.as_str() {
-                        "read" => Ok(TxtLiteral(trimmed)),
-                        "read_int" => trimmed
-                            .parse::<i64>()
-                            .map(IntLiteral)
-                            .map_err(|_| format!("Cannot parse '{}' as int", trimmed)),
-                        "read_dec" => trimmed
-                            .parse::<f64>()
-                            .map(DecLiteral)
-                            .map_err(|_| format!("Cannot parse '{}' as dec", trimmed)),
-                        _ => unreachable!(),
-                    };
+                    return Ok(if trimmed.is_empty() {
+                        TxtLiteral(trimmed)
+                    } else if let Ok(i) = trimmed.parse::<i64>() {
+                        IntLiteral(i)
+                    } else if let Ok(f) = trimmed.parse::<f64>() {
+                        DecLiteral(f)
+                    } else {
+                        TxtLiteral(trimmed)
+                    });
                 }
                 "int" => {
                     if args.len() != 1 {
