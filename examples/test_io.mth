@@ -1,0 +1,11 @@
+main() {
+    txt name = read("What is your name? ");
+    print("Hello, " + name);
+
+    int age = int(read("Your age: "));
+    print("Next year you'll be " + (age + 1));
+
+    print("Press Enter to continue...");
+    read();
+    print("Done!");
+}
