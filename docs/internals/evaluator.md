@@ -60,9 +60,7 @@ Mutating methods (`push`, `pop`, `clear`) require the receiver to be a named var
 `FnCall` checks the function name before consulting the user registry:
 
 ```
-"read"     → print optional prompt, flush stdout, read_line → TxtLiteral
-"read_int" → same but parse as i64
-"read_dec" → same but parse as f64
+"read"     → print optional prompt, flush stdout, read_line → IntLiteral | DecLiteral | TxtLiteral (auto-detected)
 "int"      → cast to int (dec truncates, txt parsed)
 "dec"      → cast to dec (int widened, txt parsed)
 "txt"      → format as string

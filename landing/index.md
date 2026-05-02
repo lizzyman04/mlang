@@ -28,7 +28,7 @@ features:
 
   - icon: 📥
     title: Unified I/O
-    details: read(), read_int(), read_dec() with optional inline prompts. Type conversion via int(), dec(), txt() casts.
+    details: read() auto-detects int, dec, or txt from user input. Optional inline prompts. Type conversion via int(), dec(), txt() casts.
 
   - icon: 🔁
     title: Rich Control Flow

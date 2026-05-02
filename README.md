@@ -52,7 +52,7 @@ main() {
 - Control flow: `if`/`else`, `while`, `for`/`in`, `break`, `continue`
 - Functions with recursion and forward references
 - User-defined structs with field access and mutation
-- Built-in I/O: `print`, `read`, `read_int`, `read_dec`
+- Built-in I/O: `print`, `read` (auto-detects `int`/`dec`/`txt`)
 - Type casts: `int(x)`, `dec(x)`, `txt(x)`
 
 ## Documentation

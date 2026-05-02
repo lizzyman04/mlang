@@ -21,15 +21,11 @@ Parsed as `ASTNode::PrintStmt` in `stmt/print.rs`. Evaluated in `stmt.rs`:
 1. If an argument is provided, evaluate it; assert it is `TxtLiteral`.
 2. `print!` the prompt (no newline); flush stdout.
 3. `stdin().read_line()` into a buffer.
-4. `trim()` the result and return as `TxtLiteral`.
-
-### `read_int([prompt: txt]) → int`
-
-Same as `read` but parses the trimmed string as `i64`. Returns a runtime error if parsing fails.
-
-### `read_dec([prompt: txt]) → dec`
-
-Same as `read` but parses as `f64`.
+4. `trim()` the result and infer the return type:
+   - empty → `TxtLiteral`
+   - parses as `i64` → `IntLiteral`
+   - parses as `f64` → `DecLiteral`
+   - otherwise → `TxtLiteral`
 
 ### `int(x) → int`
 

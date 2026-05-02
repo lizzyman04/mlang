@@ -127,7 +127,7 @@ type = "int" | "dec" | "txt" | "bool" | "void"
 
 ## Phase 7 — I/O and Type Casts
 
-Added built-in I/O functions and type conversion syntax. No new grammar productions were required — `read`, `read_int`, `read_dec` parse as ordinary `FnCall` via `IDENT call_args`. The `int(x)`, `dec(x)`, `txt(x)` casts required parser disambiguation because `int`, `dec`, `txt` lex as `Keyword` tokens rather than identifiers.
+Added built-in I/O functions and type conversion syntax. No new grammar productions were required — `read` parses as an ordinary `FnCall` via `IDENT call_args`. The `int(x)`, `dec(x)`, `txt(x)` casts required parser disambiguation because `int`, `dec`, `txt` lex as `Keyword` tokens rather than identifiers. `read` returns `int`, `dec`, or `txt` depending on what the user typed (auto-detected at evaluation time).
 
 **Grammar clarification added:**
 ```ebnf
