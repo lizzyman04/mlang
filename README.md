@@ -10,7 +10,13 @@ A math-first, statically typed programming language implemented as a tree-walkin
 
 ---
 
-## Quick start
+## Install
+
+```bash
+curl -fsSL https://lizzyman04.github.io/mlang/install.sh | sh
+```
+
+Or build from source:
 
 ```bash
 git clone https://github.com/lizzyman04/mlang.git
