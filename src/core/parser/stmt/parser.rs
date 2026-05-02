@@ -7,6 +7,7 @@ use crate::core::parser::parse::parser::Parser;
 
 use super::decider::parse_var_or_function_decl;
 use super::func::parse_function_decl;
+use super::loops::{parse_for_loop, parse_while_loop};
 use super::print::parse_print_stmt;
 use super::r#return::parse_return_stmt;
 
@@ -16,6 +17,18 @@ pub fn parse_statement(parser: &mut Parser) -> Result<ASTNode, String> {
             TokenKind::Keyword(ref kw) if kw == "main" => parse_function_decl(parser),
             TokenKind::Keyword(ref kw) if kw == "print" => parse_print_stmt(parser),
             TokenKind::Keyword(ref kw) if kw == "return" => parse_return_stmt(parser),
+            TokenKind::Keyword(ref kw) if kw == "while" => parse_while_loop(parser),
+            TokenKind::Keyword(ref kw) if kw == "for" => parse_for_loop(parser),
+            TokenKind::Keyword(ref kw) if kw == "break" => {
+                parser.advance();
+                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Semicolon))?;
+                Ok(ASTNode::Break)
+            }
+            TokenKind::Keyword(ref kw) if kw == "continue" => {
+                parser.advance();
+                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Semicolon))?;
+                Ok(ASTNode::Continue)
+            }
             TokenKind::Keyword(ref kw) if kw == "let" => parse_let_decl(parser),
             TokenKind::Keyword(ref kw) if is_variable_type(kw) => {
                 let base = kw.clone();

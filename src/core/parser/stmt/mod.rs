@@ -1,5 +1,6 @@
 pub mod parser;
 pub mod func;
+pub mod loops;
 pub mod print;
 pub mod var;
 pub mod decider;
