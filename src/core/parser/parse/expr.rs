@@ -153,36 +153,43 @@ fn parse_postfix(parser: &mut Parser) -> Result<ASTNode, String> {
             }
             Some(TokenKind::SimpleSymbol(SimpleSymbolKind::Dot)) => {
                 parser.advance();
-                let method = {
-                    let tok = parser.advance().ok_or("Expected method name after '.'")?;
+                let member = {
+                    let tok = parser.advance().ok_or("Expected field or method name after '.'")?;
                     match &tok.kind {
                         TokenKind::Identifier(m) => m.clone(),
                         _ => {
                             return Err(format!(
-                                "Expected method name after '.', found {}",
+                                "Expected field or method name after '.', found {}",
                                 tok.kind.display()
                             ))
                         }
                     }
                 };
-                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen))?;
-                let mut args = Vec::new();
-                while !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen)) {
-                    let arg = extract_expr(parse_expression(parser)?)?;
-                    args.push(arg);
-                    if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::Comma)) {
-                        parser.advance();
-                    } else {
-                        break;
-                    }
-                }
-                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
                 let object = extract_expr(node)?;
-                node = ASTNode::Expression(Expression::MethodCall {
-                    object: Box::new(object),
-                    method,
-                    args,
-                });
+                if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen)) {
+                    parser.advance();
+                    let mut args = Vec::new();
+                    while !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen)) {
+                        let arg = extract_expr(parse_expression(parser)?)?;
+                        args.push(arg);
+                        if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::Comma)) {
+                            parser.advance();
+                        } else {
+                            break;
+                        }
+                    }
+                    parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
+                    node = ASTNode::Expression(Expression::MethodCall {
+                        object: Box::new(object),
+                        method: member,
+                        args,
+                    });
+                } else {
+                    node = ASTNode::Expression(Expression::FieldAccess {
+                        object: Box::new(object),
+                        field: member,
+                    });
+                }
             }
             _ => break,
         }
@@ -230,6 +237,28 @@ fn parse_primary(parser: &mut Parser) -> Result<ASTNode, String> {
                     }
                     parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
                     Ok(ASTNode::Expression(Expression::FnCall { name, args }))
+                } else if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftBrace)) {
+                    parser.advance(); // consume `{`
+                    let mut fields = Vec::new();
+                    while !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightBrace)) {
+                        let field_name = {
+                            let tok = parser.consume_identifier()?;
+                            match &tok.kind {
+                                TokenKind::Identifier(n) => n.clone(),
+                                _ => unreachable!(),
+                            }
+                        };
+                        parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Equal))?;
+                        let field_val = extract_expr(parse_expression(parser)?)?;
+                        fields.push((field_name, field_val));
+                        if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::Comma)) {
+                            parser.advance();
+                        } else {
+                            break;
+                        }
+                    }
+                    parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightBrace))?;
+                    Ok(ASTNode::Expression(Expression::StructLiteral { name, fields }))
                 } else {
                     Ok(ASTNode::Expression(Expression::Identifier(name)))
                 }

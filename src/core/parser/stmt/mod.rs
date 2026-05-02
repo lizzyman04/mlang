@@ -5,5 +5,6 @@ pub mod print;
 pub mod var;
 pub mod decider;
 pub mod r#return;
+pub mod structs;
 
 pub use parser::parse_statement;

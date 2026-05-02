@@ -16,25 +16,34 @@ pub fn parse_stmts(tokens: Vec<Token>) -> Result<Vec<ASTNode>, String> {
 
 pub fn parse(tokens: Vec<Token>) -> Result<Vec<ASTNode>, String> {
     let mut parser = Parser::new(tokens);
-    let mut functions = Vec::new();
+    let mut nodes = Vec::new();
     let mut main_count = 0;
 
     while !parser.is_at_end() {
         let stmt = parse_statement(&mut parser)?;
 
-        if let ASTNode::FunctionDecl { name, .. } = &stmt {
-            if name == "main" {
-                main_count += 1;
+        match &stmt {
+            ASTNode::FunctionDecl { name, .. } => {
+                if name == "main" {
+                    main_count += 1;
+                }
+                nodes.push(stmt);
             }
-            functions.push(stmt);
-        } else {
-            return Err("Only function declarations are allowed at the top level.".to_string());
+            ASTNode::StructDecl { .. } => {
+                nodes.push(stmt);
+            }
+            _ => {
+                return Err(
+                    "Only function and struct declarations are allowed at the top level."
+                        .to_string(),
+                )
+            }
         }
     }
 
     match main_count {
         0 => Err("No entry point found (expected 'main')".to_string()),
-        1 => Ok(functions),
+        1 => Ok(nodes),
         _ => Err("Multiple 'main' functions found.".to_string()),
     }
 }

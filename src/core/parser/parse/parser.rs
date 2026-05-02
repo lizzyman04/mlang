@@ -14,6 +14,10 @@ impl Parser {
         self.tokens.get(self.current)
     }
 
+    pub fn peek_ahead(&self, offset: usize) -> Option<&Token> {
+        self.tokens.get(self.current + offset)
+    }
+
     pub fn advance(&mut self) -> Option<&Token> {
         if self.current < self.tokens.len() {
             let token = &self.tokens[self.current];

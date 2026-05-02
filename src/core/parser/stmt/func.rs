@@ -7,18 +7,18 @@ use crate::core::parser::parse::parser::Parser;
 
 /// Parse a type annotation from the current parser position (advances past the type).
 pub fn parse_type_annotation(parser: &mut Parser) -> Result<Type, String> {
-    let kw = match parser.peek().map(|t| t.kind.clone()) {
-        Some(TokenKind::Keyword(k)) => k,
-        Some(other) => {
-            return Err(format!(
-                "Expected type keyword, found {}",
-                other.display()
-            ))
+    match parser.peek().map(|t| t.kind.clone()) {
+        Some(TokenKind::Keyword(k)) => {
+            parser.advance();
+            parse_full_type(parser, &k)
         }
-        None => return Err("Expected type keyword, found end of input".to_string()),
-    };
-    parser.advance();
-    parse_full_type(parser, &kw)
+        Some(TokenKind::Identifier(name)) => {
+            parser.advance();
+            Ok(Type::Struct(name))
+        }
+        Some(other) => Err(format!("Expected type keyword, found {}", other.display())),
+        None => Err("Expected type keyword, found end of input".to_string()),
+    }
 }
 
 /// Given the already-consumed base keyword, parse the remainder of a type
@@ -36,7 +36,7 @@ pub fn parse_full_type(parser: &mut Parser, base: &str) -> Result<Type, String> 
             parser.consume(&TokenKind::ComparisonSymbol(ComparisonSymbolKind::Greater))?;
             Ok(Type::Array(Box::new(inner)))
         }
-        other => Err(format!("Unknown type '{}'", other)),
+        other => Ok(Type::Struct(other.to_string())),
     }
 }
 
