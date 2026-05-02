@@ -15,6 +15,12 @@ pub fn read_number(
             number.push(ch);
             chars.next();
         } else if ch == '.' && !has_dot {
+            // Don't consume if this is the start of `..` (range operator)
+            let mut lookahead = (*chars).clone();
+            lookahead.next();
+            if lookahead.peek() == Some(&'.') {
+                break;
+            }
             has_dot = true;
             number.push(ch);
             chars.next();

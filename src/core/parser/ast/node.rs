@@ -48,4 +48,13 @@ pub enum ASTNode {
     },
     Break,
     Continue,
+    VarAssign {
+        name: String,
+        value: Box<ASTNode>,
+    },
+    IfStmt {
+        condition: Box<ASTNode>,
+        then_body: Vec<ASTNode>,
+        else_body: Option<Vec<ASTNode>>,
+    },
 }

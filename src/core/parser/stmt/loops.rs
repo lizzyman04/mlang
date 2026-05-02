@@ -44,6 +44,19 @@ pub fn parse_for_loop(parser: &mut Parser) -> Result<ASTNode, String> {
     }
 }
 
+pub fn parse_if_stmt(parser: &mut Parser) -> Result<ASTNode, String> {
+    parser.consume_keyword("if")?;
+    let condition = parse_expression(parser)?;
+    let then_body = parse_block(parser)?;
+    let else_body = if parser.check(&TokenKind::Keyword("else".to_string())) {
+        parser.advance();
+        Some(parse_block(parser)?)
+    } else {
+        None
+    };
+    Ok(ASTNode::IfStmt { condition: Box::new(condition), then_body, else_body })
+}
+
 fn parse_block(parser: &mut Parser) -> Result<Vec<ASTNode>, String> {
     parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftBrace))?;
     let mut body = Vec::new();

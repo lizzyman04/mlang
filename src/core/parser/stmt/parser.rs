@@ -7,7 +7,7 @@ use crate::core::parser::parse::parser::Parser;
 
 use super::decider::parse_var_or_function_decl;
 use super::func::parse_function_decl;
-use super::loops::{parse_for_loop, parse_while_loop};
+use super::loops::{parse_for_loop, parse_if_stmt, parse_while_loop};
 use super::print::parse_print_stmt;
 use super::r#return::parse_return_stmt;
 
@@ -17,6 +17,7 @@ pub fn parse_statement(parser: &mut Parser) -> Result<ASTNode, String> {
             TokenKind::Keyword(ref kw) if kw == "main" => parse_function_decl(parser),
             TokenKind::Keyword(ref kw) if kw == "print" => parse_print_stmt(parser),
             TokenKind::Keyword(ref kw) if kw == "return" => parse_return_stmt(parser),
+            TokenKind::Keyword(ref kw) if kw == "if" => parse_if_stmt(parser),
             TokenKind::Keyword(ref kw) if kw == "while" => parse_while_loop(parser),
             TokenKind::Keyword(ref kw) if kw == "for" => parse_for_loop(parser),
             TokenKind::Keyword(ref kw) if kw == "break" => {
@@ -138,8 +139,17 @@ fn parse_ident_stmt(parser: &mut Parser) -> Result<ASTNode, String> {
                 },
             ))))
         }
+        Some(TokenKind::SimpleSymbol(SimpleSymbolKind::Equal)) => {
+            parser.advance();
+            let value = extract_expr(parse_expression(parser)?)?;
+            parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Semicolon))?;
+            Ok(ASTNode::VarAssign {
+                name,
+                value: Box::new(ASTNode::Expression(value)),
+            })
+        }
         Some(other) => Err(format!(
-            "Expected '[' or '.' after identifier '{}', found {}",
+            "Expected '=', '[', or '.' after identifier '{}', found {}",
             name,
             other.display()
         )),

@@ -183,6 +183,42 @@ pub fn execute_stmt(
             Ok(ExecutionResult::Unit)
         }
 
+        ASTNode::VarAssign { name, value } => {
+            let new_val = match *value {
+                ASTNode::Expression(expr) => evaluate(expr, env)?,
+                _ => return Err("Invalid value in assignment".to_string()),
+            };
+            let var_type = env
+                .get(&name)
+                .ok_or_else(|| format!("Undefined variable '{}'", name))?
+                .0
+                .clone();
+            let coerced = coerce_to_type(&var_type, new_val, &name)?;
+            env.set(name, var_type, coerced);
+            Ok(ExecutionResult::Unit)
+        }
+
+        ASTNode::IfStmt { condition, then_body, else_body } => {
+            let cond = match *condition {
+                ASTNode::Expression(expr) => evaluate(expr, env)?,
+                _ => return Err("If condition must be an expression".to_string()),
+            };
+            let branch = match cond {
+                Expression::BoolLiteral(true) => Some(then_body),
+                Expression::BoolLiteral(false) => else_body,
+                _ => return Err("If condition must be boolean".to_string()),
+            };
+            if let Some(stmts) = branch {
+                for stmt in stmts {
+                    match execute_stmt(stmt, env, output.as_deref_mut())? {
+                        ExecutionResult::Unit => {}
+                        other => return Ok(other),
+                    }
+                }
+            }
+            Ok(ExecutionResult::Unit)
+        }
+
         ASTNode::Break => Ok(ExecutionResult::Break),
         ASTNode::Continue => Ok(ExecutionResult::Continue),
 

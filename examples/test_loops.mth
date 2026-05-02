@@ -1,0 +1,32 @@
+main() {
+    let i = 0;
+    while i < 5 {
+        print(i);
+        i = i + 1;
+    }
+
+    for j in 0..3 {
+        print(j);
+    }
+
+    let x = 0;
+    while x < 10 {
+        if x == 3 {
+            break;
+        }
+        print(x);
+        x = x + 1;
+    }
+
+    for k in 0..5 {
+        if k == 2 {
+            continue;
+        }
+        print(k);
+    }
+
+    array<int> nums = [10, 20, 30];
+    for n in nums {
+        print(n);
+    }
+}
