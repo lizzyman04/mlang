@@ -11,6 +11,7 @@ pub struct FunctionDef {
 pub struct Environment {
     variables: HashMap<String, (Type, Expression)>,
     pub functions: HashMap<String, FunctionDef>,
+    pub struct_defs: HashMap<String, Vec<(Type, String)>>,
 }
 
 impl Environment {
@@ -18,6 +19,7 @@ impl Environment {
         Environment {
             variables: HashMap::new(),
             functions: HashMap::new(),
+            struct_defs: HashMap::new(),
         }
     }
 
@@ -37,10 +39,19 @@ impl Environment {
         self.functions.get(name)
     }
 
+    pub fn register_struct(&mut self, name: String, fields: Vec<(Type, String)>) {
+        self.struct_defs.insert(name, fields);
+    }
+
+    pub fn get_struct(&self, name: &str) -> Option<&Vec<(Type, String)>> {
+        self.struct_defs.get(name)
+    }
+
     pub fn child_for_call(&self) -> Self {
         Environment {
             variables: HashMap::new(),
             functions: self.functions.clone(),
+            struct_defs: self.struct_defs.clone(),
         }
     }
 }

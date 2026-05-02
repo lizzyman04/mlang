@@ -173,6 +173,26 @@ pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, S
             }
         }
 
+        StructLiteral { name, fields } => {
+            let evaluated = fields
+                .into_iter()
+                .map(|(fname, fexpr)| evaluate(fexpr, env).map(|v| (fname, v)))
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok(StructLiteral { name, fields: evaluated })
+        }
+
+        FieldAccess { object, field } => {
+            let obj_val = evaluate(*object, env)?;
+            match obj_val {
+                StructLiteral { fields, .. } => fields
+                    .into_iter()
+                    .find(|(fname, _)| *fname == field)
+                    .map(|(_, val)| val)
+                    .ok_or_else(|| format!("No field '{}' on struct instance", field)),
+                _ => Err(format!("Field access '.{}' on non-struct value", field)),
+            }
+        }
+
         FnCall { name, args } => {
             let func = env
                 .get_function(&name)
@@ -325,6 +345,10 @@ pub fn coerce_value(expected: &Type, value: Expression) -> Result<Expression, St
                     .collect::<Result<Vec<_>, _>>()?;
                 Ok(ArrayLiteral(coerced))
             }
+            _ => type_err(expected, &value),
+        },
+        Type::Struct(_) => match value {
+            StructLiteral { .. } => Ok(value),
             _ => type_err(expected, &value),
         },
         Type::Void => Ok(value),

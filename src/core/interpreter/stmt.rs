@@ -219,6 +219,35 @@ pub fn execute_stmt(
             Ok(ExecutionResult::Unit)
         }
 
+        ASTNode::FieldAssign { object, field, value } => {
+            let new_val = match *value {
+                ASTNode::Expression(expr) => evaluate(expr, env)?,
+                _ => return Err("Invalid value in field assignment".to_string()),
+            };
+
+            let (obj_type, obj_val) = {
+                let r = env
+                    .get(&object)
+                    .ok_or_else(|| format!("Undefined variable '{}'", object))?;
+                (r.0.clone(), r.1.clone())
+            };
+
+            match obj_val {
+                Expression::StructLiteral { name, mut fields } => {
+                    let pos = fields
+                        .iter()
+                        .position(|(fname, _)| fname == &field)
+                        .ok_or_else(|| {
+                            format!("No field '{}' on struct '{}'", field, name)
+                        })?;
+                    fields[pos].1 = new_val;
+                    env.set(object, obj_type, Expression::StructLiteral { name, fields });
+                    Ok(ExecutionResult::Unit)
+                }
+                _ => Err(format!("'{}' is not a struct", object)),
+            }
+        }
+
         ASTNode::Break => Ok(ExecutionResult::Break),
         ASTNode::Continue => Ok(ExecutionResult::Continue),
 
@@ -238,6 +267,13 @@ fn format_value(value: &Expression) -> Result<String, String> {
                 .map(format_value)
                 .collect::<Result<_, _>>()?;
             Ok(format!("[{}]", parts.join(", ")))
+        }
+        Expression::StructLiteral { name, fields } => {
+            let parts: Vec<String> = fields
+                .iter()
+                .map(|(fname, fval)| format_value(fval).map(|v| format!("{}: {}", fname, v)))
+                .collect::<Result<_, _>>()?;
+            Ok(format!("{} {{ {} }}", name, parts.join(", ")))
         }
         _ => Err("Unsupported value type in print.".to_string()),
     }
@@ -270,6 +306,10 @@ fn coerce_to_type(expected: &Type, value: Expression, var_name: &str) -> Result<
                     .collect::<Result<Vec<_>, _>>()?;
                 Ok(Expression::ArrayLiteral(coerced))
             }
+            _ => mismatch(expected, &value, var_name),
+        },
+        Type::Struct(_) => match value {
+            Expression::StructLiteral { .. } => Ok(value),
             _ => mismatch(expected, &value, var_name),
         },
         Type::Void => Ok(value),

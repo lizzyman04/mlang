@@ -27,6 +27,7 @@ pub fn infer_type(expr: &Expression) -> Type {
             let inner = elems.first().map(infer_type).unwrap_or(Type::Void);
             Type::Array(Box::new(inner))
         }
+        Expression::StructLiteral { name, .. } => Type::Struct(name.clone()),
         _ => Type::Void,
     }
 }

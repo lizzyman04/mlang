@@ -26,16 +26,20 @@ pub fn execute_repl_stmts(stmts: Vec<ASTNode>, env: &mut Environment) -> Result<
 pub fn execute(program: Vec<ASTNode>, mut output: Option<&mut String>) -> Result<(), String> {
     let mut env = Environment::new();
 
-    // First pass: register all non-main functions
+    // First pass: register structs and non-main functions
     for node in &program {
-        if let ASTNode::FunctionDecl { name, body, return_type, params } = node {
-            if name != "main" {
+        match node {
+            ASTNode::StructDecl { name, fields } => {
+                env.register_struct(name.clone(), fields.clone());
+            }
+            ASTNode::FunctionDecl { name, body, return_type, params } if name != "main" => {
                 env.register_function(name.clone(), FunctionDef {
                     params: params.clone(),
                     return_type: return_type.clone(),
                     body: body.clone(),
                 });
             }
+            _ => {}
         }
     }
 
