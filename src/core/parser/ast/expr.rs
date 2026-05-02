@@ -31,6 +31,10 @@ pub enum Expression {
         method: String,
         args: Vec<Expression>,
     },
+    FnCall {
+        name: String,
+        args: Vec<Expression>,
+    },
 }
 
 pub enum ExecutionResult {
