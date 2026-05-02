@@ -5,6 +5,7 @@ use crate::core::lexer::symbol::comparison::ComparisonSymbolKind;
 use crate::core::lexer::symbol::simple::SimpleSymbolKind;
 use crate::core::lexer::token::TokenKind;
 use crate::core::parser::ast::{Expression, Type};
+use std::io::{self, Write};
 use Expression::*;
 
 pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, String> {
@@ -194,6 +195,81 @@ pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, S
         }
 
         FnCall { name, args } => {
+            match name.as_str() {
+                "read" | "read_int" | "read_dec" => {
+                    let prompt = if let Some(arg) = args.into_iter().next() {
+                        Some(evaluate(arg, env)?)
+                    } else {
+                        None
+                    };
+                    if let Some(TxtLiteral(ref p)) = prompt {
+                        print!("{}", p);
+                        io::stdout().flush().map_err(|e| e.to_string())?;
+                    } else if prompt.is_some() {
+                        return Err("read() prompt must be a txt value".to_string());
+                    }
+                    let mut input = String::new();
+                    io::stdin().read_line(&mut input).map_err(|e| e.to_string())?;
+                    let trimmed = input.trim().to_string();
+                    return match name.as_str() {
+                        "read" => Ok(TxtLiteral(trimmed)),
+                        "read_int" => trimmed
+                            .parse::<i64>()
+                            .map(IntLiteral)
+                            .map_err(|_| format!("Cannot parse '{}' as int", trimmed)),
+                        "read_dec" => trimmed
+                            .parse::<f64>()
+                            .map(DecLiteral)
+                            .map_err(|_| format!("Cannot parse '{}' as dec", trimmed)),
+                        _ => unreachable!(),
+                    };
+                }
+                "int" => {
+                    if args.len() != 1 {
+                        return Err("'int()' takes exactly one argument".to_string());
+                    }
+                    let val = evaluate(args.into_iter().next().unwrap(), env)?;
+                    return match val {
+                        IntLiteral(_) => Ok(val),
+                        DecLiteral(f) => Ok(IntLiteral(f as i64)),
+                        TxtLiteral(ref s) => s
+                            .parse::<i64>()
+                            .map(IntLiteral)
+                            .map_err(|_| format!("Cannot convert '{}' to int", s)),
+                        other => Err(format!("Cannot convert '{}' to int", infer_type(&other))),
+                    };
+                }
+                "dec" => {
+                    if args.len() != 1 {
+                        return Err("'dec()' takes exactly one argument".to_string());
+                    }
+                    let val = evaluate(args.into_iter().next().unwrap(), env)?;
+                    return match val {
+                        DecLiteral(_) => Ok(val),
+                        IntLiteral(i) => Ok(DecLiteral(i as f64)),
+                        TxtLiteral(ref s) => s
+                            .parse::<f64>()
+                            .map(DecLiteral)
+                            .map_err(|_| format!("Cannot convert '{}' to dec", s)),
+                        other => Err(format!("Cannot convert '{}' to dec", infer_type(&other))),
+                    };
+                }
+                "txt" => {
+                    if args.len() != 1 {
+                        return Err("'txt()' takes exactly one argument".to_string());
+                    }
+                    let val = evaluate(args.into_iter().next().unwrap(), env)?;
+                    return match val {
+                        TxtLiteral(_) => Ok(val),
+                        IntLiteral(i) => Ok(TxtLiteral(i.to_string())),
+                        DecLiteral(f) => Ok(TxtLiteral(f.to_string())),
+                        BoolLiteral(b) => Ok(TxtLiteral(b.to_string())),
+                        other => Err(format!("Cannot convert '{}' to txt", infer_type(&other))),
+                    };
+                }
+                _ => {}
+            }
+
             let func = env
                 .get_function(&name)
                 .ok_or_else(|| format!("Undefined function '{}'", name))?
@@ -268,8 +344,11 @@ fn eval_binary(lv: Expression, rv: Expression, op: &crate::core::lexer::token::T
         (DecLiteral(a), IntLiteral(b), SimpleSymbol(Slash)) => {
             if b == 0 { Err("Division by zero".to_string()) } else { Ok(DecLiteral(a / b as f64)) }
         }
-        // string concatenation
+        // string concatenation (coerces right-hand side to txt)
         (TxtLiteral(a), TxtLiteral(b), SimpleSymbol(Plus)) => Ok(TxtLiteral(format!("{}{}", a, b))),
+        (TxtLiteral(a), IntLiteral(b), SimpleSymbol(Plus)) => Ok(TxtLiteral(format!("{}{}", a, b))),
+        (TxtLiteral(a), DecLiteral(b), SimpleSymbol(Plus)) => Ok(TxtLiteral(format!("{}{}", a, b))),
+        (TxtLiteral(a), BoolLiteral(b), SimpleSymbol(Plus)) => Ok(TxtLiteral(format!("{}{}", a, b))),
         // int comparisons
         (IntLiteral(a), IntLiteral(b), ComparisonSymbol(k)) => Ok(BoolLiteral(cmp_int(a, b, k))),
         (DecLiteral(a), DecLiteral(b), ComparisonSymbol(k)) => Ok(BoolLiteral(cmp_dec(a, b, k))),
