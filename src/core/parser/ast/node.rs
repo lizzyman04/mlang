@@ -31,4 +31,21 @@ pub enum ASTNode {
     },
     ExprStmt(Box<ASTNode>),
     Expression(Expression),
+    WhileLoop {
+        condition: Box<ASTNode>,
+        body: Vec<ASTNode>,
+    },
+    ForRangeLoop {
+        var: String,
+        start: Box<ASTNode>,
+        end: Box<ASTNode>,
+        body: Vec<ASTNode>,
+    },
+    ForArrayLoop {
+        var: String,
+        array: Box<ASTNode>,
+        body: Vec<ASTNode>,
+    },
+    Break,
+    Continue,
 }

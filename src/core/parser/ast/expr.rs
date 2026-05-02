@@ -36,4 +36,6 @@ pub enum Expression {
 pub enum ExecutionResult {
     Unit,
     Return(Expression),
+    Break,
+    Continue,
 }
