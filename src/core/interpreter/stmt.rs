@@ -7,7 +7,7 @@ use crate::core::parser::ast::{ASTNode, Expression, Type};
 pub fn execute_stmt(
     stmt: ASTNode,
     env: &mut Environment,
-    output: Option<&mut &mut String>,
+    mut output: Option<&mut &mut String>,
 ) -> Result<ExecutionResult, String> {
     match stmt {
         ASTNode::PrintStmt { expression } => {
@@ -107,6 +107,84 @@ pub fn execute_stmt(
                 Err("Invalid expression in return statement.".to_string())
             }
         }
+
+        ASTNode::WhileLoop { condition, body } => {
+            'wloop: loop {
+                let cond = match *condition.clone() {
+                    ASTNode::Expression(expr) => evaluate(expr, env)?,
+                    _ => return Err("While condition must be an expression".to_string()),
+                };
+                match cond {
+                    Expression::BoolLiteral(false) => break 'wloop,
+                    Expression::BoolLiteral(true) => {}
+                    _ => return Err("While condition must be boolean".to_string()),
+                }
+                for stmt in body.clone() {
+                    match execute_stmt(stmt, env, output.as_deref_mut())? {
+                        ExecutionResult::Break => break 'wloop,
+                        ExecutionResult::Continue => continue 'wloop,
+                        ExecutionResult::Return(v) => return Ok(ExecutionResult::Return(v)),
+                        ExecutionResult::Unit => {}
+                    }
+                }
+            }
+            Ok(ExecutionResult::Unit)
+        }
+
+        ASTNode::ForRangeLoop { var, start, end, body } => {
+            let start_i = match *start {
+                ASTNode::Expression(expr) => match evaluate(expr, env)? {
+                    Expression::IntLiteral(i) => i,
+                    _ => return Err("Range start must be an integer".to_string()),
+                },
+                _ => return Err("Invalid range start expression".to_string()),
+            };
+            let end_i = match *end {
+                ASTNode::Expression(expr) => match evaluate(expr, env)? {
+                    Expression::IntLiteral(i) => i,
+                    _ => return Err("Range end must be an integer".to_string()),
+                },
+                _ => return Err("Invalid range end expression".to_string()),
+            };
+            'rloop: for i in start_i..end_i {
+                env.set(var.clone(), Type::Int, Expression::IntLiteral(i));
+                for stmt in body.clone() {
+                    match execute_stmt(stmt, env, output.as_deref_mut())? {
+                        ExecutionResult::Break => break 'rloop,
+                        ExecutionResult::Continue => continue 'rloop,
+                        ExecutionResult::Return(v) => return Ok(ExecutionResult::Return(v)),
+                        ExecutionResult::Unit => {}
+                    }
+                }
+            }
+            Ok(ExecutionResult::Unit)
+        }
+
+        ASTNode::ForArrayLoop { var, array, body } => {
+            let elems = match *array {
+                ASTNode::Expression(expr) => match evaluate(expr, env)? {
+                    Expression::ArrayLiteral(elems) => elems,
+                    _ => return Err("For-in loop requires an array".to_string()),
+                },
+                _ => return Err("Invalid array expression in for-in loop".to_string()),
+            };
+            'aloop: for elem in elems {
+                let elem_type = infer_type(&elem);
+                env.set(var.clone(), elem_type, elem);
+                for stmt in body.clone() {
+                    match execute_stmt(stmt, env, output.as_deref_mut())? {
+                        ExecutionResult::Break => break 'aloop,
+                        ExecutionResult::Continue => continue 'aloop,
+                        ExecutionResult::Return(v) => return Ok(ExecutionResult::Return(v)),
+                        ExecutionResult::Unit => {}
+                    }
+                }
+            }
+            Ok(ExecutionResult::Unit)
+        }
+
+        ASTNode::Break => Ok(ExecutionResult::Break),
+        ASTNode::Continue => Ok(ExecutionResult::Continue),
 
         _ => Err("Unsupported statement.".to_string()),
     }

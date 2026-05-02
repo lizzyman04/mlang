@@ -11,7 +11,13 @@ pub fn execute_repl_stmts(stmts: Vec<ASTNode>, env: &mut Environment) -> Result<
                 println!("{}", repl_display(&value));
                 break;
             }
-            _ => continue,
+            ExecutionResult::Break => {
+                return Err("'break' used outside of a loop".to_string())
+            }
+            ExecutionResult::Continue => {
+                return Err("'continue' used outside of a loop".to_string())
+            }
+            ExecutionResult::Unit => continue,
         }
     }
     Ok(())
@@ -40,7 +46,13 @@ pub fn execute(program: Vec<ASTNode>, mut output: Option<&mut String>) -> Result
                             }
                             return Ok(());
                         }
-                        _ => continue,
+                        ExecutionResult::Break => {
+                            return Err("'break' used outside of a loop".to_string())
+                        }
+                        ExecutionResult::Continue => {
+                            return Err("'continue' used outside of a loop".to_string())
+                        }
+                        ExecutionResult::Unit => continue,
                     }
                 }
                 return Ok(());
