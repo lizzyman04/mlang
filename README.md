@@ -1,65 +1,60 @@
-# MLang — A Math-First Programming Language
+# MLang
 
-**MLang** is a modern programming language focused on symbolic and numeric computation.  
-Now with a beautiful built-in IDE for editing and running `.mlang` code interactively!
+[![CI](https://github.com/lizzyman04/mlang/actions/workflows/ci.yml/badge.svg)](https://github.com/lizzyman04/mlang/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-online-blue)](https://lizzyman04.github.io/mlang)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
----
+A math-first, statically typed programming language implemented as a tree-walking interpreter in Rust.
 
-## 📚 Table of Contents
-
-- [Overview](docs/overview.md)
-- [Language Grammar](docs/grammar.md)
-- [Runtime Architecture](docs/runtime.md)
-- [Math Engine](docs/engine.md)
-- [GUI Mode](docs/gui.md)
-- [Examples](examples/)
-- [License](LICENSE)
+**[Documentation](https://lizzyman04.github.io/mlang)** · [Examples](examples/) · [Contributing](docs/README.md)
 
 ---
 
-## 🚀 Getting Started
-
-### Install Rust
+## Quick start
 
 ```bash
-curl https://sh.rustup.rs -sSf | sh
-````
-
-### Build MLang
-
-```bash
+git clone https://github.com/lizzyman04/mlang.git
+cd mlang
 cargo build --release
+./target/release/mlang examples/hello.mth
 ```
 
-### Run MLang
+## Example
 
-Run from terminal:
+```mlang
+struct Point {
+    int x
+    int y
+}
 
-```bash
-cargo run -- --cli examples/hello.mlang
+int distance(Point a, Point b) {
+    int dx = a.x - b.x;
+    int dy = a.y - b.y;
+    return dx * dx + dy * dy;
+}
+
+main() {
+    Point p1 = Point{ x = 0, y = 0 };
+    Point p2 = Point{ x = 3, y = 4 };
+    print(distance(p1, p2));   # 25
+}
 ```
 
-Or launch the GUI IDE:
+## Language features
 
-```bash
-cargo run
-```
+- Types: `int`, `dec`, `txt`, `bool`, `array<T>`, structs
+- Control flow: `if`/`else`, `while`, `for`/`in`, `break`, `continue`
+- Functions with recursion and forward references
+- User-defined structs with field access and mutation
+- Built-in I/O: `print`, `read`, `read_int`, `read_dec`
+- Type casts: `int(x)`, `dec(x)`, `txt(x)`
 
----
+## Documentation
 
-## 🧠 Contributing
+Full language reference, contributor guide, and architecture docs are at **[lizzyman04.github.io/mlang](https://lizzyman04.github.io/mlang)**.
 
-* Use clear, atomic Git commits (one feature or fix per commit)
-* Code should be formatted with `rustfmt`
+For internals and contribution workflow, see the [`docs/`](docs/README.md) directory.
 
-### Example Commit Message
+## License
 
-```
-feat: add lexer module and implement token scanning
-```
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE).
