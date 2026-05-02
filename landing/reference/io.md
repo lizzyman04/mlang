@@ -24,36 +24,29 @@ print("Done: " + true);     # Done: true
 
 ## Input
 
-### `read()` → `txt`
+### `read()` / `read(txt prompt)` → `int` | `dec` | `txt`
 
-Reads a line from stdin, trims whitespace, returns as `txt`.
+Reads a line from stdin and trims whitespace. The return type is inferred automatically from the input:
+
+| Input looks like | Return type |
+|---|---|
+| Empty string | `txt` |
+| Integer (e.g. `42`, `-7`) | `int` |
+| Decimal (e.g. `3.14`, `-0.5`) | `dec` |
+| Anything else | `txt` |
 
 ```mlang
-txt name = read();
+let a = read();                     # "42"    → int
+let b = read();                     # "3.14"  → dec
+let c = read();                     # "hello" → txt
+let name = read("Your name: ");     # prompt, then auto-detect
 ```
 
-### `read(txt prompt)` → `txt`
-
-Prints the prompt (no newline) then reads a line.
+Use `let` for auto-detected reads. If you need a specific type, wrap with a cast:
 
 ```mlang
-txt name = read("Enter your name: ");
-```
-
-### `read_int()` / `read_int(txt prompt)` → `int`
-
-Reads and parses input as `int`. Raises a runtime error if the input is not a valid integer.
-
-```mlang
-int n = read_int("Enter a number: ");
-```
-
-### `read_dec()` / `read_dec(txt prompt)` → `dec`
-
-Reads and parses input as `dec`. Raises a runtime error if the input is not a valid decimal.
-
-```mlang
-dec x = read_dec("Enter a decimal: ");
+txt raw   = txt(read("Value: "));   # force txt regardless of content
+int exact = int(read("Number: "));  # force int, error if not parseable
 ```
 
 ## Type conversion
@@ -77,14 +70,12 @@ int trunc = int(9.9);                  # 9 (truncated)
 
 ```mlang
 main() {
-    txt name = read("What is your name? ");
+    let name  = read("What is your name? ");   # txt
+    let age   = read("Your age: ");            # int  (if user types a number)
+    let price = read("Item price: ");          # dec  (if user types e.g. 4.99)
+
     print("Hello, " + name);
-
-    int age = int(read("Your age: "));
     print("Next year you will be " + (age + 1));
-
-    print("Press Enter to continue...");
-    read();
-    print("Done!");
+    print("Total with tax: " + (price * 1.1));
 }
 ```

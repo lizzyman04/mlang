@@ -74,13 +74,17 @@ main() {
 
 ## Interactive I/O
 
+`read()` automatically detects whether input is an `int`, `dec`, or `txt`:
+
 ```mlang
 main() {
-    txt name = read("Enter your name: ");
-    int age  = int(read("Enter your age: "));
+    let name  = read("Enter your name: ");    # txt
+    let age   = read("Enter your age: ");     # int  (e.g. "25")
+    let score = read("Enter your score: ");   # dec  (e.g. "9.5")
 
     print("Hello, " + name + "!");
     print("Next year you will be " + (age + 1));
+    print("Doubled score: " + (score * 2.0));
 }
 ```
 
