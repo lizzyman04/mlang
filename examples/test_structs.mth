@@ -1,0 +1,41 @@
+struct Point {
+    int x
+    int y
+}
+
+struct Rect {
+    Point top_left
+    Point bottom_right
+}
+
+Point origin() {
+    return Point { x = 0, y = 0 };
+}
+
+Point add_points(Point a, Point b) {
+    return Point { x = a.x + b.x, y = a.y + b.y };
+}
+
+main() {
+    let p1 = Point { x = 10, y = 20 };
+    print(p1.x);
+    print(p1.y);
+
+    p1.y = 42;
+    print(p1.y);
+
+    let rect = Rect {
+        top_left = Point { x = 0, y = 10 },
+        bottom_right = Point { x = 10, y = 0 }
+    };
+    print(rect.top_left.y);
+    print(rect.bottom_right.x);
+
+    let o = origin();
+    print(o.x);
+
+    let p2 = Point { x = 3, y = 7 };
+    let p3 = add_points(p1, p2);
+    print(p3.x);
+    print(p3.y);
+}

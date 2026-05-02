@@ -237,7 +237,16 @@ fn parse_primary(parser: &mut Parser) -> Result<ASTNode, String> {
                     }
                     parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
                     Ok(ASTNode::Expression(Expression::FnCall { name, args }))
-                } else if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftBrace)) {
+                } else if parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftBrace))
+                    && matches!(
+                        parser.peek_ahead(1).map(|t| &t.kind),
+                        Some(TokenKind::Identifier(_))
+                    )
+                    && matches!(
+                        parser.peek_ahead(2).map(|t| &t.kind),
+                        Some(TokenKind::SimpleSymbol(SimpleSymbolKind::Equal))
+                    )
+                {
                     parser.advance(); // consume `{`
                     let mut fields = Vec::new();
                     while !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightBrace)) {
