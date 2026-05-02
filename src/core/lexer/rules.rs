@@ -3,7 +3,7 @@ use std::collections::HashSet;
 
 pub fn is_keyword(word: &str) -> bool {
     let keywords: HashSet<&str> = [
-        "int", "dec", "txt", "bool", "true", "false", "main", "print", "return",
+        "int", "dec", "txt", "bool", "void", "true", "false", "main", "print", "return",
         "if", "else", "array", "let", "while", "for", "in", "break", "continue",
     ]
     .iter()
@@ -14,7 +14,7 @@ pub fn is_keyword(word: &str) -> bool {
 }
 
 pub fn is_variable_type(word: &str) -> bool {
-    matches!(word, "int" | "dec" | "txt" | "bool" | "array")
+    matches!(word, "int" | "dec" | "txt" | "bool" | "array" | "void")
 }
 
 pub fn infer_type(expr: &Expression) -> Type {
