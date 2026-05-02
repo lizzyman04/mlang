@@ -35,6 +35,14 @@ pub enum Expression {
         name: String,
         args: Vec<Expression>,
     },
+    StructLiteral {
+        name: String,
+        fields: Vec<(String, Expression)>,
+    },
+    FieldAccess {
+        object: Box<Expression>,
+        field: String,
+    },
 }
 
 pub enum ExecutionResult {

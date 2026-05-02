@@ -57,4 +57,13 @@ pub enum ASTNode {
         then_body: Vec<ASTNode>,
         else_body: Option<Vec<ASTNode>>,
     },
+    StructDecl {
+        name: String,
+        fields: Vec<(Type, String)>,
+    },
+    FieldAssign {
+        object: String,
+        field: String,
+        value: Box<ASTNode>,
+    },
 }

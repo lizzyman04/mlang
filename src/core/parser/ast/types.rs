@@ -5,6 +5,7 @@ pub enum Type {
     Txt,
     Bool,
     Array(Box<Type>),
+    Struct(String),
     Void,
 }
 
@@ -29,6 +30,7 @@ impl std::fmt::Display for Type {
             Type::Txt => write!(f, "txt"),
             Type::Bool => write!(f, "bool"),
             Type::Array(inner) => write!(f, "array<{}>", inner),
+            Type::Struct(name) => write!(f, "{}", name),
             Type::Void => write!(f, "void"),
         }
     }
