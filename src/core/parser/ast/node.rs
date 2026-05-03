@@ -20,11 +20,7 @@ pub enum ASTNode {
         var_type: Type,
         value: Box<ASTNode>,
     },
-    LetDecl {
-        name: String,
-        value: Box<ASTNode>,
-    },
-    IndexAssign {
+IndexAssign {
         name: String,
         index: Box<ASTNode>,
         value: Box<ASTNode>,

@@ -31,8 +31,7 @@ pub fn parse_statement(parser: &mut Parser) -> Result<ASTNode, String> {
                 parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Semicolon))?;
                 Ok(ASTNode::Continue)
             }
-            TokenKind::Keyword(ref kw) if kw == "let" => parse_let_decl(parser),
-            TokenKind::Keyword(ref kw) if kw == "struct" => parse_struct_decl(parser),
+TokenKind::Keyword(ref kw) if kw == "struct" => parse_struct_decl(parser),
             TokenKind::Keyword(ref kw) if is_variable_type(kw) => {
                 let base = kw.clone();
                 // int(x), dec(x), txt(x) used as cast expression statements
@@ -93,25 +92,7 @@ pub fn parse_statement(parser: &mut Parser) -> Result<ASTNode, String> {
     }
 }
 
-fn parse_let_decl(parser: &mut Parser) -> Result<ASTNode, String> {
-    parser.advance(); // consume `let`
-    let name = {
-        let tok = parser.consume_identifier()?;
-        match &tok.kind {
-            TokenKind::Identifier(n) => n.clone(),
-            _ => unreachable!(),
-        }
-    };
-    parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Equal))?;
-    let expr = parse_expression(parser)?;
-    parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Semicolon))?;
-    Ok(ASTNode::LetDecl {
-        name,
-        value: Box::new(expr),
-    })
-}
-
-/// Handles statements that start with an identifier:
+///Handles statements that start with an identifier:
 /// - `name[index] = value;`  → IndexAssign
 /// - `name.method(args);`    → ExprStmt (method call)
 fn parse_ident_stmt(parser: &mut Parser) -> Result<ASTNode, String> {

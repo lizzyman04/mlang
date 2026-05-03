@@ -4,7 +4,7 @@ use std::collections::HashSet;
 pub fn is_keyword(word: &str) -> bool {
     let keywords: HashSet<&str> = [
         "int", "dec", "txt", "bool", "void", "true", "false", "main", "print", "return",
-        "if", "else", "array", "let", "while", "for", "in", "break", "continue", "struct",
+        "if", "else", "array", "while", "for", "in", "break", "continue", "struct",
     ]
     .iter()
     .copied()

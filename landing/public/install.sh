@@ -46,7 +46,7 @@ fi
 
 $SUDO chmod +x "$INSTALL_DIR/$FILENAME"
 
-echo "MLang $VERSION installed to $INSTALL_DIR/$FILENAME"
+echo "MLang $VERSION installed."
 
 if ! echo ":$PATH:" | grep -q ":$INSTALL_DIR:"; then
     echo "note: add $INSTALL_DIR to your PATH to use mlang from anywhere"

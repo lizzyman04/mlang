@@ -36,18 +36,7 @@ pub fn execute_stmt(
             }
         }
 
-        ASTNode::LetDecl { name, value } => {
-            if let ASTNode::Expression(expr) = *value {
-                let evaluated = evaluate(expr, env)?;
-                let inferred = infer_type(&evaluated);
-                env.set(name, inferred, evaluated);
-                Ok(ExecutionResult::Unit)
-            } else {
-                Err("Invalid expression in let declaration.".to_string())
-            }
-        }
-
-        ASTNode::IndexAssign { name, index, value } => {
+ASTNode::IndexAssign { name, index, value } => {
             let idx = match *index {
                 ASTNode::Expression(expr) => match evaluate(expr, env)? {
                     Expression::IntLiteral(i) if i >= 0 => i as usize,
