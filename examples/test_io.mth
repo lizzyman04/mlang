@@ -1,13 +1,13 @@
 main() {
-    let age = read("Enter an integer (e.g. 25): ");
+    int age = int(read("Enter an integer (e.g. 25): "));
     print("Next year: " + (age + 1));
 
-    let price = read("Enter a decimal (e.g. 9.99): ");
+    dec price = dec(read("Enter a decimal (e.g. 9.99): "));
     print("Double: " + (price * 2.0));
 
-    let name = read("Enter your name: ");
+    txt name = read("Enter your name: ");
     print("Hello, " + name + "!");
 
-    let empty = read("Press Enter to continue: ");
+    txt empty = read("Press Enter to continue: ");
     print("Empty input returned: '" + empty + "'");
 }

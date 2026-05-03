@@ -1,5 +1,5 @@
 main() {
-    let i = 0;
+    int i = 0;
     while i < 5 {
         print(i);
         i = i + 1;
@@ -9,7 +9,7 @@ main() {
         print(j);
     }
 
-    let x = 0;
+    int x = 0;
     while x < 10 {
         if x == 3 {
             break;

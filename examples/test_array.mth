@@ -11,7 +11,7 @@ main() {
   nums.push(6);
   print(nums.len());
 
-  let last = nums.pop();
+  int last = nums.pop();
   print(last);
   print(nums.len());
 
@@ -22,7 +22,7 @@ main() {
   # Test 5: contains and slice
   array<int> a = [10, 20, 30, 40, 50];
   print(a.contains(30));
-  let sub = a.slice(1, 3);
+  array<int> sub = a.slice(1, 3);
   print(sub[0]);
 
   # Test 6: dec array with int coercion
