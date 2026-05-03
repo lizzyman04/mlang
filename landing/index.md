@@ -4,7 +4,7 @@ layout: home
 hero:
   name: MLang
   text: A Math-First Programming Language
-  tagline: Statically typed, expressive, and built in Rust. Write clean scripts with native structs, functions, and I/O — no boilerplate.
+  tagline: Statically typed and expressive. Write clean scripts with native structs, functions, and I/O — no boilerplate.
   actions:
     - theme: brand
       text: Get Started
@@ -54,8 +54,8 @@ int distance_sq(Point a, Point b) {
 }
 
 main() {
-    let p1 = Point { x = 0, y = 0 };
-    let p2 = Point { x = 3, y = 4 };
+    Point p1 = Point { x = 0, y = 0 };
+    Point p2 = Point { x = 3, y = 4 };
     print(distance_sq(p1, p2));   # 25
 
     txt name = read("Your name: ");

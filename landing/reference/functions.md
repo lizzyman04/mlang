@@ -82,8 +82,8 @@ Vec2 scale(Vec2 v, dec factor) {
 }
 
 main() {
-    let v = Vec2 { x = 1.0, y = 2.0 };
-    let doubled = scale(v, 2.0);
+    Vec2 v = Vec2 { x = 1.0, y = 2.0 };
+    Vec2 doubled = scale(v, 2.0);
     print(doubled.x);   # 2.0
 }
 ```

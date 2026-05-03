@@ -16,10 +16,10 @@ Fields are separated by newlines (no semicolons inside struct bodies).
 ## Instantiation
 
 ```mlang
-let p = Point { x = 10, y = 20 };
+Point p = Point { x = 10, y = 20 };
 ```
 
-Or with an explicit type:
+With a different variable name:
 
 ```mlang
 Point origin = Point { x = 0, y = 0 };
@@ -48,7 +48,7 @@ struct Rect {
 }
 
 main() {
-    let r = Rect {
+    Rect r = Rect {
         top_left     = Point { x = 0, y = 10 },
         bottom_right = Point { x = 10, y = 0 }
     };
@@ -67,8 +67,8 @@ Point translate(Point p, int dx, int dy) {
 }
 
 main() {
-    let p = Point { x = 1, y = 1 };
-    let q = translate(p, 5, 3);
+    Point p = Point { x = 1, y = 1 };
+    Point q = translate(p, 5, 3);
     print(q.x);   # 6
     print(q.y);   # 4
 }

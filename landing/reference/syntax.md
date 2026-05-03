@@ -41,10 +41,6 @@ int   count  = 0;
 dec   ratio  = 0.5;
 txt   label  = "hello";
 bool  active = true;
-
-# Type inference
-let n = 42;       # int
-let s = "world";  # txt
 ```
 
 ## Assignment

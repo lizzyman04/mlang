@@ -36,13 +36,13 @@ Reads a line from stdin and trims whitespace. The return type is inferred automa
 | Anything else | `txt` |
 
 ```mlang
-let a = read();                     # "42"    → int
-let b = read();                     # "3.14"  → dec
-let c = read();                     # "hello" → txt
-let name = read("Your name: ");     # prompt, then auto-detect
+int a    = int(read());              # "42"    → int
+dec b    = dec(read());              # "3.14"  → dec
+txt c    = read();                   # "hello" → txt
+txt name = read("Your name: ");      # prompt → txt
 ```
 
-Use `let` for auto-detected reads. If you need a specific type, wrap with a cast:
+Wrap with a cast to force a specific type:
 
 ```mlang
 txt raw   = txt(read("Value: "));   # force txt regardless of content
@@ -70,9 +70,9 @@ int trunc = int(9.9);                  # 9 (truncated)
 
 ```mlang
 main() {
-    let name  = read("What is your name? ");   # txt
-    let age   = read("Your age: ");            # int  (if user types a number)
-    let price = read("Item price: ");          # dec  (if user types e.g. 4.99)
+    txt name  = read("What is your name? ");
+    int age   = int(read("Your age: "));
+    dec price = dec(read("Item price: "));
 
     print("Hello, " + name);
     print("Next year you will be " + (age + 1));

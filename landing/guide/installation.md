@@ -1,22 +1,12 @@
 # Installation
 
-## Build from source (recommended)
+## Install script
 
 ```bash
-git clone https://github.com/lizzyman04/mlang.git
-cd mlang
-cargo build --release
+curl -fsSL https://lizzyman04.github.io/mlang/install.sh | sh
 ```
 
-The compiled binary is at `target/release/mlang`. Copy it anywhere on your `PATH`:
-
-```bash
-# Linux / macOS
-sudo cp target/release/mlang /usr/local/bin/mlang
-
-# or add the release dir to PATH in your shell profile
-export PATH="$HOME/mlang/target/release:$PATH"
-```
+This downloads the latest release binary and places it in `/usr/local/bin/mlang` (Linux/macOS) or `~/bin/mlang` (Windows).
 
 Verify:
 
@@ -36,11 +26,4 @@ MLang source files use the `.mth` extension.
 
 ## Editor support
 
-No dedicated extension exists yet. For syntax highlighting, configure your editor to treat `.mth` files as a Rust-like language — the block structure and keywords are similar enough for basic coloring.
-
-## Updating
-
-```bash
-git pull
-cargo build --release
-```
+No dedicated extension exists yet. For basic syntax highlighting, configure your editor to treat `.mth` files as a generic scripting language with C-style block structure.

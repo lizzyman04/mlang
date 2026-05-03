@@ -1,21 +1,12 @@
 # Getting Started
 
-MLang is a statically typed, interpreted scripting language. Every program begins in a `main()` function. The compiler is a single Rust binary — no VM, no runtime to install.
+MLang is a statically typed, interpreted scripting language. Every program begins in a `main()` function.
 
-## Prerequisites
-
-- [Rust](https://rustup.rs) 1.80 or newer
-- `cargo` (ships with Rust)
-
-## Build from source
+## Install
 
 ```bash
-git clone https://github.com/lizzyman04/mlang.git
-cd mlang
-cargo build --release
+curl -fsSL https://lizzyman04.github.io/mlang/install.sh | sh
 ```
-
-The binary lands at `target/release/mlang`.
 
 ## Your first program
 
@@ -30,9 +21,7 @@ main() {
 Run it:
 
 ```bash
-cargo run -- hello.mth
-# or, after building:
-./target/release/mlang hello.mth
+mlang hello.mth
 ```
 
 Output:
@@ -43,7 +32,7 @@ Hello, MLang!
 
 ## Variables
 
-MLang is statically typed. Declare with an explicit type or use `let` for inference:
+MLang is statically typed. Declare variables with an explicit type:
 
 ```mlang
 main() {
@@ -51,9 +40,6 @@ main() {
     dec pi  = 3.14159;
     txt msg = "ready";
     bool ok = true;
-
-    let x = 42;        # inferred as int
-    let s = "hello";   # inferred as txt
 
     print(age + 1);
     print("Message: " + msg);

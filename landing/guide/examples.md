@@ -46,7 +46,7 @@ main() {
         print(n);
     }
 
-    let first_three = nums.slice(0, 3);
+    array<int> first_three = nums.slice(0, 3);
     print(first_three);         # [10, 20, 30]
 }
 ```
@@ -64,9 +64,9 @@ Point midpoint(Point a, Point b) {
 }
 
 main() {
-    let p1 = Point { x = 0, y = 0 };
-    let p2 = Point { x = 10, y = 6 };
-    let mid = midpoint(p1, p2);
+    Point p1 = Point { x = 0, y = 0 };
+    Point p2 = Point { x = 10, y = 6 };
+    Point mid = midpoint(p1, p2);
     print(mid.x);   # 5
     print(mid.y);   # 3
 }
@@ -78,9 +78,9 @@ main() {
 
 ```mlang
 main() {
-    let name  = read("Enter your name: ");    # txt
-    let age   = read("Enter your age: ");     # int  (e.g. "25")
-    let score = read("Enter your score: ");   # dec  (e.g. "9.5")
+    txt name  = read("Enter your name: ");
+    int age   = int(read("Enter your age: "));
+    dec score = dec(read("Enter your score: "));
 
     print("Hello, " + name + "!");
     print("Next year you will be " + (age + 1));

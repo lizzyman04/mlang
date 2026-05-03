@@ -91,7 +91,7 @@ Named collection of typed fields. See [Structs](./structs) for full details.
 
 ```mlang
 struct Point { int x; int y }
-let p = Point { x = 3, y = 7 };
+Point p = Point { x = 3, y = 7 };
 print(p.x);
 ```
 
