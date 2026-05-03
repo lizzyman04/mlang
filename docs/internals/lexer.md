@@ -48,7 +48,7 @@ Defined in `rules.rs::is_keyword()`:
 ```
 int  dec  txt  bool  void  true  false
 main  print  return  if  else
-array  let  while  for  in  break  continue  struct
+array  while  for  in  break  continue  struct
 ```
 
 `true` and `false` are tokenised directly as `Bool(true)` / `Bool(false)` by `identifiers.rs` before the keyword check.
