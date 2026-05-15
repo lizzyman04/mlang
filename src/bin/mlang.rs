@@ -145,12 +145,16 @@ fn main() {
     let mut args = std::env::args().skip(1);
 
     match args.next().as_deref() {
+        Some("--version") | Some("-v") => {
+            println!("MLang {}", env!("CARGO_PKG_VERSION"));
+        }
         Some("repl") => run_repl(),
         Some(path) => std::process::exit(run_file(path)),
         None => {
             eprintln!("Usage:");
             eprintln!("  mlang <file.mth>   Run a .mth source file");
             eprintln!("  mlang repl         Start interactive REPL");
+            eprintln!("  mlang --version    Print version");
             std::process::exit(1);
         }
     }
