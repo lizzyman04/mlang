@@ -2,6 +2,7 @@ use mlang::core::{
     interpreter::{env::Environment, execute, execute_repl_stmts},
     lexer::tokenizer::tokenize,
     parser::parse::entry::{parse, parse_stmts},
+    resolver::resolve_imports,
 };
 use std::{
     fs,
@@ -40,6 +41,19 @@ fn run_file(path: &str) -> i32 {
             eprintln!(
                 "{} in {}: {}",
                 color("31", "Parsing Error"),
+                color("33", &format!("`{}`", path)),
+                e
+            );
+            return 1;
+        }
+    };
+
+    let ast = match resolve_imports(std::path::Path::new(path), ast) {
+        Ok(a) => a,
+        Err(e) => {
+            eprintln!(
+                "{} in {}: {}",
+                color("31", "Module Error"),
                 color("33", &format!("`{}`", path)),
                 e
             );
