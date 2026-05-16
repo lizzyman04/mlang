@@ -1,0 +1,7 @@
+main() {
+    print(math.solve("2x + 4 = 10"));
+    print(math.solve("3x - 12 = 0"));
+    print(math.solve("x = 5"));
+    print(math.solve("x/2 = 5"));
+    print(math.solve("x + 8 = 0"));
+}
