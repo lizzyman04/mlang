@@ -72,6 +72,15 @@ fn test_structs() {
     assert_eq!(lines[7], "49", "add_points p3.y");
 }
 
+#[test]
+fn test_errors() {
+    let out = run_file("tests/interpreter/errors.mth");
+    let lines: Vec<&str> = out.lines().collect();
+    assert_eq!(lines[0], "5",                          "divide(10,2) = 5");
+    assert_eq!(lines[1], "Caught: division by zero",   "error caught");
+    assert_eq!(lines[2], "Inner error: division by zero", "nested catch");
+}
+
 // ── math tests ────────────────────────────────────────────────────────────────
 
 #[test]

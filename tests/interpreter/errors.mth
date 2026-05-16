@@ -1,0 +1,28 @@
+void divide(int a, int b) {
+    if b == 0 {
+        return Err("division by zero");
+    }
+    return Ok(a / b);
+}
+
+main() {
+    try {
+        int result = divide(10, 2);
+        print(result);
+    } catch err {
+        print("Should not print: " + err);
+    }
+
+    try {
+        int result = divide(10, 0);
+        print("Should not reach here");
+    } catch err {
+        print("Caught: " + err);
+    }
+
+    try {
+        int x = divide(10, 0);
+    } catch err {
+        print("Inner error: " + err);
+    }
+}
