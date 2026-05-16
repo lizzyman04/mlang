@@ -16,33 +16,51 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'Reference', link: '/reference/syntax' },
-      {
-        text: 'GitHub',
-        link: 'https://github.com/lizzyman04/mlang',
-      },
+      { text: 'Math', link: '/math/' },
+      { text: 'GitHub', link: 'https://github.com/lizzyman04/mlang' },
     ],
 
-    sidebar: [
-      {
-        text: 'Getting Started',
-        items: [
-          { text: 'Introduction', link: '/guide/getting-started' },
-          { text: 'Installation', link: '/guide/installation' },
-          { text: 'Examples', link: '/guide/examples' },
-        ],
-      },
-      {
-        text: 'Language Reference',
-        items: [
-          { text: 'Syntax Overview', link: '/reference/syntax' },
-          { text: 'Types', link: '/reference/types' },
-          { text: 'Functions', link: '/reference/functions' },
-          { text: 'Structs', link: '/reference/structs' },
-          { text: 'I/O', link: '/reference/io' },
-          { text: 'Math Engine', link: '/reference/math' },
-        ],
-      },
-    ],
+    sidebar: {
+      '/guide/': [
+        {
+          text: 'Getting Started',
+          collapsed: false,
+          items: [
+            { text: 'Introduction', link: '/guide/getting-started' },
+            { text: 'Installation', link: '/guide/installation' },
+            { text: 'Examples', link: '/guide/examples' },
+          ],
+        },
+      ],
+      '/reference/': [
+        {
+          text: 'Language Reference',
+          collapsed: false,
+          items: [
+            { text: 'Syntax Overview', link: '/reference/syntax' },
+            { text: 'Types', link: '/reference/types' },
+            { text: 'Functions', link: '/reference/functions' },
+            { text: 'Structs', link: '/reference/structs' },
+            { text: 'I/O', link: '/reference/io' },
+            { text: 'Modules', link: '/reference/modules' },
+          ],
+        },
+      ],
+      '/math/': [
+        {
+          text: 'Math Engine',
+          collapsed: false,
+          items: [
+            { text: 'Overview', link: '/math/' },
+            { text: 'Solving Equations', link: '/math/solve' },
+            { text: 'Simplifying', link: '/math/simplify' },
+            { text: 'Evaluating', link: '/math/evaluate' },
+            { text: 'Constants', link: '/math/constants' },
+            { text: 'Functions', link: '/math/functions' },
+          ],
+        },
+      ],
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/lizzyman04/mlang' },
