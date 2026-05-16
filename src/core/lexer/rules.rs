@@ -5,6 +5,7 @@ pub fn is_keyword(word: &str) -> bool {
     let keywords: HashSet<&str> = [
         "int", "dec", "txt", "bool", "void", "true", "false", "main", "print", "return",
         "if", "else", "array", "while", "for", "in", "break", "continue", "struct",
+        "module", "import",
     ]
     .iter()
     .copied()

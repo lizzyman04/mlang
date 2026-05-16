@@ -19,6 +19,30 @@ pub fn read_identifier_or_keyword(
         }
     }
 
+    // Detect `identifier::member` and collapse into one token
+    if chars.peek() == Some(&':') {
+        chars.next(); // consume first ':'
+        if chars.peek() == Some(&':') {
+            chars.next(); // consume second ':'
+            let mut member = String::new();
+            while let Some(&ch) = chars.peek() {
+                if ch.is_alphanumeric() || ch == '_' {
+                    member.push(ch);
+                    chars.next();
+                } else {
+                    break;
+                }
+            }
+            if member.is_empty() {
+                return Err(format!("Expected identifier after '{}::'", ident));
+            }
+            ident.push_str("::");
+            ident.push_str(&member);
+        } else {
+            return Err(format!("Unexpected ':' after identifier '{}'", ident));
+        }
+    }
+
     let kind = match ident.as_str() {
         "true" => TokenKind::Bool(true),
         "false" => TokenKind::Bool(false),
