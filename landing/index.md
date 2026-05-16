@@ -20,7 +20,7 @@ features:
 
   - icon: ⚡
     title: Fast & Lightweight
-    details: Lexer → Parser → AST → Evaluator pipeline with zero external runtime dependencies. Starts instantly.
+    details: Zero external runtime dependencies. Lexer → Parser → AST → Evaluator pipeline starts instantly.
 
   - icon: 🏗️
     title: Structs & Functions
@@ -28,19 +28,15 @@ features:
 
   - icon: 📥
     title: Unified I/O
-    details: read() auto-detects int, dec, or txt from user input. Optional inline prompts. Type conversion via int(), dec(), txt() casts.
+    details: read() auto-detects int, dec, or txt from user input. Type conversion via int(), dec(), txt() casts.
 
   - icon: 🔁
     title: Rich Control Flow
     details: if/else, while loops, for-range loops, for-in array loops, break, continue, and early return.
 
-  - icon: 📦
-    title: Array Builtins
-    details: push, pop, clear, len, contains, slice — all as ergonomic method calls directly on array variables.
-
   - icon: 🧮
     title: Symbolic Math
-    details: Built-in equation solver for linear and quadratic equations. Simplify expressions, evaluate with constants like π and e.
+    details: Built-in math engine for solving equations, simplifying expressions, and numeric evaluation. Constants like π, e, τ.
 ---
 
 ## A taste of MLang
