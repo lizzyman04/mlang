@@ -39,6 +39,7 @@ export default defineConfig({
           { text: 'Functions', link: '/reference/functions' },
           { text: 'Structs', link: '/reference/structs' },
           { text: 'I/O', link: '/reference/io' },
+          { text: 'Math Engine', link: '/reference/math' },
         ],
       },
     ],

@@ -113,4 +113,20 @@ main() {
 }
 ```
 
+## Math Engine
+
+```mlang
+main() {
+    # Solve equations
+    print(math.solve("2x + 4 = 10").result())   # x = 3
+    print(math.solve("x^2 - 5x + 6 = 0").result())   # x = 3, x = 2
+
+    # Simplify expressions
+    print(math.simplify("2x + x + 4 - 1"))   # 3x + 3
+
+    # Evaluate numeric expressions
+    print(math.evaluate("pi * 3^2"))   # 28.274333882308138
+}
+```
+
 > All example files live in the `examples/` directory of the repository.

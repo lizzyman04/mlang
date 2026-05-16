@@ -37,6 +37,10 @@ features:
   - icon: 📦
     title: Array Builtins
     details: push, pop, clear, len, contains, slice — all as ergonomic method calls directly on array variables.
+
+  - icon: 🧮
+    title: Symbolic Math
+    details: Built-in equation solver for linear and quadratic equations. Simplify expressions, evaluate with constants like π and e.
 ---
 
 ## A taste of MLang
