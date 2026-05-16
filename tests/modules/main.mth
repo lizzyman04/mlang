@@ -1,0 +1,9 @@
+import "adder.mth"
+import "math.mth"
+
+main() {
+    print(adder::add(5, 3));
+    print(adder::subtract(10, 4));
+    print(math::double(7));
+    print(math::square(4));
+}

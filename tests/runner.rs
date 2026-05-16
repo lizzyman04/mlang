@@ -2,7 +2,9 @@ use mlang::core::{
     interpreter::execute,
     lexer::tokenizer::tokenize,
     parser::parse::entry::parse,
+    resolver::resolve_imports,
 };
+use std::path::Path;
 
 fn run_file(path: &str) -> String {
     let source = std::fs::read_to_string(path)
@@ -11,6 +13,8 @@ fn run_file(path: &str) -> String {
         .unwrap_or_else(|e| panic!("tokenize failed for {}: {}", path, e));
     let ast = parse(tokens)
         .unwrap_or_else(|e| panic!("parse failed for {}: {}", path, e));
+    let ast = resolve_imports(Path::new(path), ast)
+        .unwrap_or_else(|e| panic!("resolve failed for {}: {}", path, e));
     let mut output = String::new();
     execute(ast, Some(&mut output))
         .unwrap_or_else(|e| panic!("execute failed for {}: {}", path, e));
@@ -111,4 +115,14 @@ fn test_math_symbolic() {
     );
     assert_eq!(lines[3], "14",    "evaluate 2+3*4");
     assert_eq!(lines[4], "4",     "evaluate sqrt(16)");
+}
+
+#[test]
+fn test_modules() {
+    let out = run_file("tests/modules/main.mth");
+    let lines: Vec<&str> = out.lines().collect();
+    assert_eq!(lines[0], "8",  "adder::add(5, 3)");
+    assert_eq!(lines[1], "6",  "adder::subtract(10, 4)");
+    assert_eq!(lines[2], "14", "math::double(7)");
+    assert_eq!(lines[3], "16", "math::square(4)");
 }
