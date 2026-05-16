@@ -15,6 +15,28 @@ use super::structs::parse_struct_decl;
 pub fn parse_statement(parser: &mut Parser) -> Result<ASTNode, String> {
     if let Some(token) = parser.peek() {
         match token.kind.clone() {
+            TokenKind::Keyword(ref kw) if kw == "module" => {
+                parser.advance();
+                let name = match parser.advance() {
+                    Some(tok) => match &tok.kind {
+                        TokenKind::Identifier(n) => n.clone(),
+                        other => return Err(format!("Expected module name, found {}", other.display())),
+                    },
+                    None => return Err("Expected module name after 'module'".to_string()),
+                };
+                Ok(ASTNode::ModuleDecl { name })
+            }
+            TokenKind::Keyword(ref kw) if kw == "import" => {
+                parser.advance();
+                let path = match parser.advance() {
+                    Some(tok) => match &tok.kind {
+                        TokenKind::Txt(s) => s.clone(),
+                        other => return Err(format!("Expected file path string after 'import', found {}", other.display())),
+                    },
+                    None => return Err("Expected file path after 'import'".to_string()),
+                };
+                Ok(ASTNode::ImportDecl { path })
+            }
             TokenKind::Keyword(ref kw) if kw == "main" => parse_function_decl(parser),
             TokenKind::Keyword(ref kw) if kw == "print" => parse_print_stmt(parser),
             TokenKind::Keyword(ref kw) if kw == "return" => parse_return_stmt(parser),

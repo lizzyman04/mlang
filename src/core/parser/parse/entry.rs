@@ -29,12 +29,14 @@ pub fn parse(tokens: Vec<Token>) -> Result<Vec<ASTNode>, String> {
                 }
                 nodes.push(stmt);
             }
-            ASTNode::StructDecl { .. } => {
+            ASTNode::StructDecl { .. }
+            | ASTNode::ImportDecl { .. }
+            | ASTNode::ModuleDecl { .. } => {
                 nodes.push(stmt);
             }
             _ => {
                 return Err(
-                    "Only function and struct declarations are allowed at the top level."
+                    "Only function, struct, module, and import declarations are allowed at the top level."
                         .to_string(),
                 )
             }
@@ -46,4 +48,29 @@ pub fn parse(tokens: Vec<Token>) -> Result<Vec<ASTNode>, String> {
         1 => Ok(nodes),
         _ => Err("Multiple 'main' functions found.".to_string()),
     }
+}
+
+/// Parses a module file (no `main` required).
+pub fn parse_module_file(tokens: Vec<Token>) -> Result<Vec<ASTNode>, String> {
+    let mut parser = Parser::new(tokens);
+    let mut nodes = Vec::new();
+
+    while !parser.is_at_end() {
+        let stmt = parse_statement(&mut parser)?;
+        match &stmt {
+            ASTNode::FunctionDecl { .. }
+            | ASTNode::StructDecl { .. }
+            | ASTNode::ModuleDecl { .. } => {
+                nodes.push(stmt);
+            }
+            _ => {
+                return Err(
+                    "Only function, struct, and module declarations are allowed in a module file."
+                        .to_string(),
+                )
+            }
+        }
+    }
+
+    Ok(nodes)
 }
