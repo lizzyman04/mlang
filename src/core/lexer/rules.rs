@@ -29,6 +29,7 @@ pub fn infer_type(expr: &Expression) -> Type {
             Type::Array(Box::new(inner))
         }
         Expression::StructLiteral { name, .. } => Type::Struct(name.clone()),
+        Expression::ErrValue(_) => Type::Void,
         _ => Type::Void,
     }
 }

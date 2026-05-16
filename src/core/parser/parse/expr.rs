@@ -277,6 +277,18 @@ fn parse_primary(parser: &mut Parser) -> Result<ASTNode, String> {
                 parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
                 Ok(expr)
             }
+            TokenKind::Keyword(kw) if kw == "Err" => {
+                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen))?;
+                let msg = extract_expr(parse_expression(parser)?)?;
+                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
+                Ok(ASTNode::Expression(Expression::ErrExpr(Box::new(msg))))
+            }
+            TokenKind::Keyword(kw) if kw == "Ok" => {
+                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen))?;
+                let val = extract_expr(parse_expression(parser)?)?;
+                parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen))?;
+                Ok(ASTNode::Expression(Expression::OkExpr(Box::new(val))))
+            }
             TokenKind::Keyword(kw) if matches!(kw.as_str(), "int" | "dec" | "txt") => {
                 let name = kw.clone();
                 if !parser.check(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen)) {

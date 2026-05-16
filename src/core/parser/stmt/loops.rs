@@ -57,6 +57,21 @@ pub fn parse_if_stmt(parser: &mut Parser) -> Result<ASTNode, String> {
     Ok(ASTNode::IfStmt { condition: Box::new(condition), then_body, else_body })
 }
 
+pub fn parse_try_catch(parser: &mut Parser) -> Result<ASTNode, String> {
+    parser.consume_keyword("try")?;
+    let try_body = parse_block(parser)?;
+    parser.consume_keyword("catch")?;
+    let catch_var = {
+        let tok = parser.advance().ok_or("Expected catch variable name")?;
+        match &tok.kind {
+            TokenKind::Identifier(n) => n.clone(),
+            other => return Err(format!("Expected identifier for catch variable, found {}", other.display())),
+        }
+    };
+    let catch_body = parse_block(parser)?;
+    Ok(ASTNode::TryCatch { try_body, catch_var, catch_body })
+}
+
 fn parse_block(parser: &mut Parser) -> Result<Vec<ASTNode>, String> {
     parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::LeftBrace))?;
     let mut body = Vec::new();

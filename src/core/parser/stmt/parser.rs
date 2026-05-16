@@ -1,13 +1,13 @@
 use crate::core::lexer::rules::is_variable_type;
 use crate::core::lexer::symbol::simple::SimpleSymbolKind;
 use crate::core::lexer::token::TokenKind;
-use crate::core::parser::ast::{ASTNode, Expression};
+use crate::core::parser::ast::{ASTNode, Expression, Type};
 use crate::core::parser::parse::expr::{extract_expr, parse_expression};
 use crate::core::parser::parse::parser::Parser;
 
 use super::decider::parse_var_or_function_decl;
-use super::func::parse_function_decl;
-use super::loops::{parse_for_loop, parse_if_stmt, parse_while_loop};
+use super::func::{parse_function_decl, parse_function_decl_with_signature};
+use super::loops::{parse_for_loop, parse_if_stmt, parse_try_catch, parse_while_loop};
 use super::print::parse_print_stmt;
 use super::r#return::parse_return_stmt;
 use super::structs::parse_struct_decl;
@@ -43,6 +43,7 @@ pub fn parse_statement(parser: &mut Parser) -> Result<ASTNode, String> {
             TokenKind::Keyword(ref kw) if kw == "if" => parse_if_stmt(parser),
             TokenKind::Keyword(ref kw) if kw == "while" => parse_while_loop(parser),
             TokenKind::Keyword(ref kw) if kw == "for" => parse_for_loop(parser),
+            TokenKind::Keyword(ref kw) if kw == "try" => parse_try_catch(parser),
             TokenKind::Keyword(ref kw) if kw == "break" => {
                 parser.advance();
                 parser.consume(&TokenKind::SimpleSymbol(SimpleSymbolKind::Semicolon))?;
@@ -103,6 +104,24 @@ TokenKind::Keyword(ref kw) if kw == "struct" => parse_struct_decl(parser),
                     _ => unreachable!(),
                 };
                 parse_var_or_function_decl(parser, &type_name)
+            }
+            // Untyped (void) function declaration: `name(int a, int b) { }`
+            TokenKind::Identifier(_)
+                if matches!(
+                    parser.peek_ahead(1).map(|t| &t.kind),
+                    Some(TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen))
+                ) && matches!(
+                    parser.peek_ahead(2).map(|t| &t.kind),
+                    Some(
+                        TokenKind::SimpleSymbol(SimpleSymbolKind::RightParen)
+                            | TokenKind::Keyword(_)
+                    )
+                ) => {
+                let fn_name = match parser.advance().unwrap().kind.clone() {
+                    TokenKind::Identifier(n) => n,
+                    _ => unreachable!(),
+                };
+                parse_function_decl_with_signature(parser, Type::Void, &fn_name)
             }
             TokenKind::Identifier(_) => parse_ident_stmt(parser),
             _ => Err(format!(
