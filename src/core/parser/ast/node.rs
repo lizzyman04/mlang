@@ -62,4 +62,10 @@ IndexAssign {
         field: String,
         value: Box<ASTNode>,
     },
+    ModuleDecl {
+        name: String,
+    },
+    ImportDecl {
+        path: String,
+    },
 }
