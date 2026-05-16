@@ -16,6 +16,6 @@ pub fn render_equation(
     final_expr: &ExprNode,
 ) -> MathExpr {
     let steps = format_steps(transform_steps);
-    let result = expr_to_string(final_expr);
+    let result = format!("{} = {}", variable, expr_to_string(final_expr));
     MathExpr::new(original.to_string(), variable.to_string(), steps, result)
 }

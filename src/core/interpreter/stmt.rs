@@ -264,6 +264,7 @@ fn format_value(value: &Expression) -> Result<String, String> {
                 .collect::<Result<_, _>>()?;
             Ok(format!("{} {{ {} }}", name, parts.join(", ")))
         }
+        Expression::MathExpr(m) => Ok(m.result().to_string()),
         _ => Err("Unsupported value type in print.".to_string()),
     }
 }

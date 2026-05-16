@@ -2,6 +2,7 @@ use crate::core::lexer::token::Token;
 
 #[derive(Debug, Clone)]
 pub enum Expression {
+    MathExpr(crate::builtins::math::MathExpr),
     IntLiteral(i64),
     DecLiteral(f64),
     TxtLiteral(String),

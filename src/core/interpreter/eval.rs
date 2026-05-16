@@ -10,7 +10,7 @@ use Expression::*;
 
 pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, String> {
     match expr {
-        IntLiteral(_) | DecLiteral(_) | TxtLiteral(_) | BoolLiteral(_) => Ok(expr),
+        IntLiteral(_) | DecLiteral(_) | TxtLiteral(_) | BoolLiteral(_) | MathExpr(_) => Ok(expr),
 
         ArrayLiteral(elems) => {
             let evaluated = elems
@@ -88,6 +88,12 @@ pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, S
         }
 
         MethodCall { object, method, args } => {
+            if let Identifier(ref obj_name) = *object {
+                if obj_name == "math" {
+                    return dispatch_math_method(&method, args, env);
+                }
+            }
+
             let maybe_var = match &*object {
                 Identifier(n) => Some(n.clone()),
                 _ => None,
@@ -307,6 +313,35 @@ pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, S
 
             Ok(Expression::IntLiteral(0))
         }
+    }
+}
+
+fn dispatch_math_method(
+    method: &str,
+    args: Vec<Expression>,
+    env: &mut Environment,
+) -> Result<Expression, String> {
+    if args.len() != 1 {
+        return Err(format!("math.{}() requires exactly one argument", method));
+    }
+    let arg = evaluate(args.into_iter().next().unwrap(), env)?;
+    let TxtLiteral(input) = arg else {
+        return Err(format!("math.{}() expects a txt argument", method));
+    };
+    match method {
+        "solve" => {
+            let result = crate::builtins::math::solve_equation(&input)?;
+            Ok(MathExpr(result))
+        }
+        "simplify" => {
+            let result = crate::builtins::math::simplify_expression(&input)?;
+            Ok(TxtLiteral(result))
+        }
+        "evaluate" => {
+            let result = crate::builtins::math::evaluate_expression(&input)?;
+            Ok(DecLiteral(result))
+        }
+        _ => Err(format!("Unknown math method '{}'", method)),
     }
 }
 

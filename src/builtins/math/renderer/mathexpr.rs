@@ -1,3 +1,4 @@
+#[derive(Debug, Clone)]
 pub struct MathExpr {
     original: String,
     variable: String,
