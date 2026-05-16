@@ -13,6 +13,9 @@ pub fn execute_stmt(
         ASTNode::PrintStmt { expression } => {
             if let ASTNode::Expression(expr) = *expression {
                 let value = evaluate(expr, env)?;
+                if let Expression::ErrValue(ref msg) = value {
+                    return Ok(ExecutionResult::Err(*msg.clone()));
+                }
                 let text = format_value(&value)?;
                 if let Some(out) = output {
                     out.push_str(&format!("{}\n", text));
@@ -28,6 +31,9 @@ pub fn execute_stmt(
         ASTNode::VarDecl { var_type, name, value } => {
             if let ASTNode::Expression(expr) = *value {
                 let evaluated = evaluate(expr, env)?;
+                if let Expression::ErrValue(msg) = evaluated {
+                    return Ok(ExecutionResult::Err(*msg));
+                }
                 let coerced = coerce_to_type(&var_type, evaluated, &name)?;
                 env.set(name, var_type, coerced);
                 Ok(ExecutionResult::Unit)
@@ -84,14 +90,21 @@ ASTNode::IndexAssign { name, index, value } => {
 
         ASTNode::ExprStmt(expr_node) => {
             if let ASTNode::Expression(expr) = *expr_node {
-                evaluate(expr, env)?;
+                let val = evaluate(expr, env)?;
+                if let Expression::ErrValue(msg) = val {
+                    return Ok(ExecutionResult::Err(*msg));
+                }
             }
             Ok(ExecutionResult::Unit)
         }
 
         ASTNode::ReturnStmt { value } => {
             if let ASTNode::Expression(expr) = *value {
-                Ok(ExecutionResult::Return(evaluate(expr, env)?))
+                let val = evaluate(expr, env)?;
+                if let Expression::ErrValue(inner) = val {
+                    return Ok(ExecutionResult::Err(*inner));
+                }
+                Ok(ExecutionResult::Return(val))
             } else {
                 Err("Invalid expression in return statement.".to_string())
             }
@@ -113,6 +126,7 @@ ASTNode::IndexAssign { name, index, value } => {
                         ExecutionResult::Break => break 'wloop,
                         ExecutionResult::Continue => continue 'wloop,
                         ExecutionResult::Return(v) => return Ok(ExecutionResult::Return(v)),
+                        ExecutionResult::Err(e) => return Ok(ExecutionResult::Err(e)),
                         ExecutionResult::Unit => {}
                     }
                 }
@@ -142,6 +156,7 @@ ASTNode::IndexAssign { name, index, value } => {
                         ExecutionResult::Break => break 'rloop,
                         ExecutionResult::Continue => continue 'rloop,
                         ExecutionResult::Return(v) => return Ok(ExecutionResult::Return(v)),
+                        ExecutionResult::Err(e) => return Ok(ExecutionResult::Err(e)),
                         ExecutionResult::Unit => {}
                     }
                 }
@@ -165,6 +180,7 @@ ASTNode::IndexAssign { name, index, value } => {
                         ExecutionResult::Break => break 'aloop,
                         ExecutionResult::Continue => continue 'aloop,
                         ExecutionResult::Return(v) => return Ok(ExecutionResult::Return(v)),
+                        ExecutionResult::Err(e) => return Ok(ExecutionResult::Err(e)),
                         ExecutionResult::Unit => {}
                     }
                 }
@@ -177,6 +193,9 @@ ASTNode::IndexAssign { name, index, value } => {
                 ASTNode::Expression(expr) => evaluate(expr, env)?,
                 _ => return Err("Invalid value in assignment".to_string()),
             };
+            if let Expression::ErrValue(msg) = new_val {
+                return Ok(ExecutionResult::Err(*msg));
+            }
             let var_type = env
                 .get(&name)
                 .ok_or_else(|| format!("Undefined variable '{}'", name))?
@@ -240,6 +259,36 @@ ASTNode::IndexAssign { name, index, value } => {
         ASTNode::Break => Ok(ExecutionResult::Break),
         ASTNode::Continue => Ok(ExecutionResult::Continue),
 
+        ASTNode::TryCatch { try_body, catch_var, catch_body } => {
+            let mut caught: Option<Expression> = None;
+            'try_block: for stmt in try_body {
+                match execute_stmt(stmt, env, output.as_deref_mut())? {
+                    ExecutionResult::Err(msg) => {
+                        caught = Some(msg);
+                        break 'try_block;
+                    }
+                    ExecutionResult::Return(v) => return Ok(ExecutionResult::Return(v)),
+                    ExecutionResult::Break => return Ok(ExecutionResult::Break),
+                    ExecutionResult::Continue => return Ok(ExecutionResult::Continue),
+                    ExecutionResult::Unit => {}
+                }
+            }
+            if let Some(msg) = caught {
+                let msg_str = match msg {
+                    Expression::TxtLiteral(s) => s,
+                    other => format!("{:?}", other),
+                };
+                env.set(catch_var, Type::Txt, Expression::TxtLiteral(msg_str));
+                for stmt in catch_body {
+                    match execute_stmt(stmt, env, output.as_deref_mut())? {
+                        ExecutionResult::Unit => {}
+                        other => return Ok(other),
+                    }
+                }
+            }
+            Ok(ExecutionResult::Unit)
+        }
+
         _ => Err("Unsupported statement.".to_string()),
     }
 }
@@ -265,6 +314,10 @@ fn format_value(value: &Expression) -> Result<String, String> {
             Ok(format!("{} {{ {} }}", name, parts.join(", ")))
         }
         Expression::MathExpr(m) => Ok(m.result().to_string()),
+        Expression::ErrValue(msg) => {
+            let inner = format_value(msg)?;
+            Ok(format!("Err({})", inner))
+        }
         _ => Err("Unsupported value type in print.".to_string()),
     }
 }

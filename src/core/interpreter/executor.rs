@@ -17,6 +17,13 @@ pub fn execute_repl_stmts(stmts: Vec<ASTNode>, env: &mut Environment) -> Result<
             ExecutionResult::Continue => {
                 return Err("'continue' used outside of a loop".to_string())
             }
+            ExecutionResult::Err(e) => {
+                let msg = match e {
+                    Expression::TxtLiteral(s) => s,
+                    other => format!("{:?}", other),
+                };
+                return Err(format!("Unhandled error: {}", msg));
+            }
             ExecutionResult::Unit => continue,
         }
     }
@@ -68,6 +75,13 @@ pub fn execute(program: Vec<ASTNode>, mut output: Option<&mut String>) -> Result
                         }
                         ExecutionResult::Continue => {
                             return Err("'continue' used outside of a loop".to_string())
+                        }
+                        ExecutionResult::Err(e) => {
+                            let msg = match e {
+                                Expression::TxtLiteral(s) => s,
+                                other => format!("{:?}", other),
+                            };
+                            return Err(format!("Unhandled error: {}", msg));
                         }
                         ExecutionResult::Unit => continue,
                     }

@@ -12,6 +12,13 @@ pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, S
     match expr {
         IntLiteral(_) | DecLiteral(_) | TxtLiteral(_) | BoolLiteral(_) | MathExpr(_) => Ok(expr),
 
+        ErrExpr(msg) => {
+            let evaluated = evaluate(*msg, env)?;
+            Ok(ErrValue(Box::new(evaluated)))
+        }
+        OkExpr(val) => evaluate(*val, env),
+        ErrValue(_) => Ok(expr),
+
         ArrayLiteral(elems) => {
             let evaluated = elems
                 .into_iter()
@@ -27,7 +34,9 @@ pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, S
 
         Binary { left, operator, right } => {
             let lv = evaluate(*left, env)?;
+            if matches!(&lv, ErrValue(_)) { return Ok(lv); }
             let rv = evaluate(*right, env)?;
+            if matches!(&rv, ErrValue(_)) { return Ok(rv); }
             eval_binary(lv, rv, &operator)
         }
 
@@ -307,6 +316,9 @@ pub fn evaluate(expr: Expression, env: &mut Environment) -> Result<Expression, S
                     crate::core::parser::ast::expr::ExecutionResult::Break
                     | crate::core::parser::ast::expr::ExecutionResult::Continue => {
                         return Err("break/continue outside loop".to_string())
+                    }
+                    crate::core::parser::ast::expr::ExecutionResult::Err(e) => {
+                        return Ok(ErrValue(Box::new(e)));
                     }
                 }
             }
