@@ -68,4 +68,9 @@ IndexAssign {
     ImportDecl {
         path: String,
     },
+    TryCatch {
+        try_body: Vec<ASTNode>,
+        catch_var: String,
+        catch_body: Vec<ASTNode>,
+    },
 }

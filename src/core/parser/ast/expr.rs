@@ -44,6 +44,9 @@ pub enum Expression {
         object: Box<Expression>,
         field: String,
     },
+    ErrExpr(Box<Expression>),
+    OkExpr(Box<Expression>),
+    ErrValue(Box<Expression>),
 }
 
 pub enum ExecutionResult {
@@ -51,4 +54,5 @@ pub enum ExecutionResult {
     Return(Expression),
     Break,
     Continue,
+    Err(Expression),
 }
