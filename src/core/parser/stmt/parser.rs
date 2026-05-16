@@ -63,14 +63,17 @@ TokenKind::Keyword(ref kw) if kw == "struct" => parse_struct_decl(parser),
                     parse_var_or_function_decl(parser, &base)
                 }
             }
-            // Struct-typed function declaration: `StructName funcName(...)`
+            // Struct-typed declaration: `StructName name(...)` (function) or `StructName name =` (variable)
             TokenKind::Identifier(_)
                 if matches!(
                     parser.peek_ahead(1).map(|t| &t.kind),
                     Some(TokenKind::Identifier(_))
                 ) && matches!(
                     parser.peek_ahead(2).map(|t| &t.kind),
-                    Some(TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen))
+                    Some(
+                        TokenKind::SimpleSymbol(SimpleSymbolKind::LeftParen)
+                            | TokenKind::SimpleSymbol(SimpleSymbolKind::Equal)
+                    )
                 ) =>
             {
                 let type_name = match parser.advance().unwrap().kind.clone() {

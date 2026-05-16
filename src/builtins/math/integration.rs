@@ -2,16 +2,36 @@ use crate::builtins::math::lexer::tokenize_equation;
 use crate::builtins::math::normalizer::normalize;
 use crate::builtins::math::parser::{parse_equation_from_tokens, BinaryOp, ExprNode};
 use crate::builtins::math::renderer::{render_equation, MathExpr};
+use crate::builtins::math::solver::solve;
 use crate::builtins::math::transformer::{render_expr, transform};
 
 /// Full pipeline: tokenize → parse → normalize → transform → render.
+/// Falls back to the algebraic solver (no steps) for non-linear equations.
 pub fn solve_equation(eq_str: &str) -> Result<MathExpr, String> {
     let tokens = tokenize_equation(eq_str)?;
     let equation = parse_equation_from_tokens(&tokens)?;
     let normalized = normalize(equation)?;
     let var = detect_variable(&normalized)?;
-    let (final_expr, transform_steps) = transform(&normalized)?;
-    Ok(render_equation(eq_str, &var, &transform_steps, &final_expr))
+
+    if let Ok((final_expr, transform_steps)) = transform(&normalized) {
+        return Ok(render_equation(eq_str, &var, &transform_steps, &final_expr));
+    }
+
+    let solutions = solve(&normalized).map_err(|e| e.to_string())?;
+    let result = format_solutions(&var, &solutions);
+    Ok(MathExpr::new(eq_str.to_string(), var, vec![], result))
+}
+
+fn format_solutions(var: &str, solutions: &[ExprNode]) -> String {
+    match solutions {
+        [] => "no solution".to_string(),
+        [single] => format!("{} = {}", var, render_expr(single)),
+        multiple => multiple
+            .iter()
+            .map(|s| format!("{} = {}", var, render_expr(s)))
+            .collect::<Vec<_>>()
+            .join(", "),
+    }
 }
 
 /// Simplifies an expression (no `=` required) by combining like terms.
